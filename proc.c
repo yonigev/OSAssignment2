@@ -159,7 +159,9 @@ userinit(void)
   // writes to be visible, and the lock is also needed
   // because the assignment might not be atomic.
   acquire(&ptable.lock);
-
+  //set Default handler
+  memset(p->handlers,SIG_DFL,32*sizeof(void*));
+  
   p->state = RUNNABLE;
 
   release(&ptable.lock);
@@ -225,7 +227,11 @@ fork(void)
   pid = np->pid;
 
   acquire(&ptable.lock);
-
+  //task 2.1.2.2 - inheriting parent's stuff
+  if(curproc!=0){
+    for(i=0; i<32; i++){np->handlers[i]=curproc->handlers[i];}
+    np->mask=curproc->mask;
+  }
   np->state = RUNNABLE;
 
   release(&ptable.lock);
@@ -543,4 +549,26 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+//Task 2.1.3
+uint sigprocmask(uint sigmask){
+  struct proc* curproc=myproc();
+  if(curproc!=0){
+    uint oldmask=curproc->mask;
+    curproc->mask=sigmask;
+    return oldmask;
+  }
+  return 0;
+}
+//Task 2.1.4
+sighandler_t signal(int signum, sighandler_t handler){
+  struct proc* curproc=myproc();
+    if(curproc!=0  && signum >= 0 && signum <= 31){
+      sighandler_t oldHandler=curproc->handlers[signum];
+      curproc->handlers[signum]=handler;
+      return oldHandler;
+
+    }
+    return -1;
 }

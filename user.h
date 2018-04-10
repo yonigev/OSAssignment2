@@ -23,7 +23,9 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-
+//assignment2 task 2.1.3
+uint sigprocmask(uint);
+sighandler_t signal(int, sighandler_t);
 // ulib.c
 int stat(char*, struct stat*);
 char* strcpy(char*, char*);

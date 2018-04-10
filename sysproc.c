@@ -89,3 +89,22 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+//Task 2.1.3
+int sys_sigprocmask(void){
+  uint sigmask;
+  if(argint(0, &sigmask) < 0)
+    return -1;
+  return sigprocmask(sigmask);
+}
+//Task 2.1.4
+int sys_signal(void){
+  int signum;
+  sighandler_t handler;
+  //TODO:make sure 'argint' is ok
+  if(argint(0, &signum) < 0 || argint(1, (sighandler_t)handler) < 0)
+    return -1;
+  return signal(signum,handler);
+
+  
+
+}
