@@ -10,6 +10,8 @@ struct sleeplock;
 struct stat;
 struct superblock;
 
+
+
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);
@@ -107,7 +109,7 @@ int             cpuid(void);
 void            exit(void);
 int             fork(void);
 int             growproc(int);
-int             kill(int);
+int             kill(int,int);
 struct cpu*     mycpu(void);
 struct proc*    myproc();
 void            pinit(void);
@@ -156,6 +158,7 @@ int             fetchint(uint, int*);
 int             fetchstr(uint, char**);
 uint            sigprocmask(uint);
 sighandler_t    signal(int,sighandler_t);
+void            sigret(void);
 void            syscall(void);
 
 // timer.c

@@ -30,10 +30,10 @@ int
 sys_kill(void)
 {
   int pid;
-
-  if(argint(0, &pid) < 0)
+  int signum;
+  if(argint(0, &pid) < 0 || argint(1,&signum) < 0)
     return -1;
-  return kill(pid);
+  return kill(pid, signum);
 }
 
 int
@@ -103,8 +103,9 @@ int sys_signal(void){
   //TODO:make sure 'argint' is ok
   if(argint(0, &signum) < 0 || argint(1, (sighandler_t)handler) < 0)
     return -1;
-  return signal(signum,handler);
-
-  
+  return (void*)signal(signum,handler);
+}
+//TODO:implement?
+int sigret(void){
 
 }

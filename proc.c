@@ -495,22 +495,26 @@ wakeup(void *chan)
 // Process won't exit until it returns
 // to user space (see trap in trap.c).
 int
-kill(int pid)
+kill(int pid, int signum)
 {
   struct proc *p;
-
-  acquire(&ptable.lock);
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->pid == pid){
-      p->killed = 1;
-      // Wake process from sleep if necessary.
-      if(p->state == SLEEPING)
-        p->state = RUNNABLE;
-      release(&ptable.lock);
-      return 0;
+  //Legal signal number
+  if(signum >= 0 && signum <=31){
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->pid == pid){
+        
+        p->pending=p->pending | (1 << signum);
+        //p->killed = 1;
+        // Wake process from sleep if necessary.
+        //if(p->state == SLEEPING)
+        //  p->state = RUNNABLE;
+        release(&ptable.lock);
+        return 0;
+      }
     }
+    release(&ptable.lock);
   }
-  release(&ptable.lock);
   return -1;
 }
 
@@ -572,3 +576,5 @@ sighandler_t signal(int signum, sighandler_t handler){
     }
     return -1;
 }
+
+
