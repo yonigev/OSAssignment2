@@ -36,7 +36,8 @@ struct context {
   uint ebp;
   uint eip;
 };
-
+//declaration for hasSignal function
+int hasSignal(struct proc* p,int signum);
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state

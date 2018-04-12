@@ -1,6 +1,7 @@
 #include "mmu.h"
 
   # vectors.S sends all traps here.
+ #extern check_sigs
 .globl alltraps
 alltraps:
   # Build trap frame.
@@ -23,6 +24,9 @@ alltraps:
   # Return falls through to trapret...
 .globl trapret
 trapret:
+  pushl $esp    #
+  call check_kernel_sigs
+  addl $4, $esp #
   popal
   popl %gs
   popl %fs

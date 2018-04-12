@@ -343,7 +343,7 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
@@ -354,9 +354,13 @@ scheduler(void)
       if(p->state != RUNNABLE)
         continue;
 
+
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
+      // DO THIS ONLY IF THIS PROC IS NOT STOPPED
+      if(hasSignal(p,SIGSTOP) && !(hasSignal(p,SIGCONT)))
+          continue;
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
@@ -503,9 +507,8 @@ kill(int pid, int signum)
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->pid == pid){
-        
-        p->pending=p->pending | (1 << signum);
-        //p->killed = 1;
+          p->pending = p->pending | (1 << signum);
+          //p->killed = 1;
         // Wake process from sleep if necessary.
         //if(p->state == SLEEPING)
         //  p->state = RUNNABLE;
@@ -575,6 +578,21 @@ sighandler_t signal(int signum, sighandler_t handler){
 
     }
     return -1;
+}
+
+
+void
+sigret(){
+    struct proc* curproc=myproc();
+    if(curproc!=0){
+        curproc->tf=&curproc->trap_backup;
+    }
+}
+//return 1 if process p has received signal 'signum'
+int hasSignal(struct proc* p,int signum){
+    if(((p->pending & (1 << signum)) > 0))
+        return 1;
+    return 0;
 }
 
 
