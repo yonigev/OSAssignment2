@@ -113,76 +113,95 @@ int isBlocked(int signum) {
     struct proc *curproc = myproc();
     if (curproc != 0) {
         if (curproc->mask & (1 << signum) > 0)
-            return 1;
-        return 0;
+            return 0;
+        return 1;
     }
 }
+
 //cancel a certain signal for a certain process!
-void cancelSignal(struct proc* p,int signum){
-    if(signum >= 0 && signum <= 31){
+void cancelSignal(struct proc *p, int signum) {
+    if (signum >= 0 && signum <= 31) {
         p->pending = p->pending ^ (1 << signum);
     }
 }
+
 //called in kernel mode
 void
 check_kernel_sigs() {
     int i;
+    int stopped = 1;
     struct proc *curproc = myproc();
-    if (curproc != 0) {
-        //first check for KERNEL signals
-        //if this signal is pending
-        if (hasSignal(curproc,SIGKILL) && !isBlocked(SIGKILL)) {
-            curproc->killed = 1;
-            if (curproc->state == SLEEPING)
-                curproc->state = RUNNABLE;
-        } else if (hasSignal(curproc, SIGCONT) && !isBlocked(SIGCONT)) {
-            if (hasSignal(curproc, SIGSTOP)) {
-                //cancel the SIGSTOP signal
-                //by XOR'ing the pending signals with the SIGSTOP signal
-                cancelSignal(curproc,SIGSTOP);
-                //cancel the SIGCONT signal, it's already handled
-                cancelSignal(curproc,SIGCONT);
-            } else {
-                //cancel SIGCONT, it should be ignored (no SIGSTOP is present)
-                curproc->pending = curproc->pending ^ (1 << SIGCONT);
-            }
-        } else if (hasSignal(curproc,SIGSTOP) && !isBlocked(SIGSTOP)) {
-            //yield();
-
-        }
-
-
-        for(i=0; i<32; i++){
-            //if it's a user signal tha's NOT blocked
-            if(i!=SIGSTOP && i!=SIGCONT && i!=SIGKILL && !isBlocked(i)){
-                //handle user signal.
-                if(curproc->handlers[i] == SIG_IGN) {              //ignore if required
-                    cancelSignal(curproc,i);
-                    continue;
-                }
-                else if(curproc->handlers[i]==SIG_DFL) {        // kill by default (according to instructions)
-                    cancelSignal(curproc,i);
+    if (curproc == 0 || curproc->mask == 0 || curproc->pending == 0)
+        return;
+    for (i = 0; i < 32 && hasSignal(curproc, i) && !isBlocked(i); i++) {
+        curproc->mask_backup = curproc->mask;
+        curproc->mask = 0;
+        switch (i) {
+            case SIGKILL:
+                if (curproc->handlers[i] == SIG_DFL) {
                     curproc->killed = 1;
-                    break;
+                    if (curproc->state == SLEEPING)
+                        curproc->state = RUNNABLE;
                 }
-                else{ //NOT default and NOT ignore. meaning it's some handler pointer.
-                    //curproc->trap_backup=*curproc->tf;  //TODO: check if backing up a struct like this makes sense
-                    memmove(&curproc->trap_backup,curproc->tf,sizeof(struct trapframe));
-                    asm{
-                    //TODO: push arguments and INJECT trapret and stuff :(
-
-
-
-                    }
-
-
-
+                break;
+            case SIGCONT:
+                if (curproc->handlers[i] == SIG_DFL) {
+                    if (hasSignal(curproc, SIGSTOP))
+                        cancelSignal(curproc, SIGSTOP);
+                    cancelSignal(curproc, SIGCONT);
                 }
-
-
-            }
+                break;
+            case SIGSTOP:
+                if (curproc->handlers[i] == SIG_DFL)
+                    while ((!hasSignal(curproc, SIGCONT)) && (!hasSignal(curproc, SIGKILL)))
+                        yield();
+                break;
+            default:
+                if (curproc->handlers[i] == (void *) SIG_DFL) {
+                    cancelSignal(curproc, i);
+                    curproc->killed = 1;
+                    if (curproc->state == SLEEPING)
+                        curproc->state = RUNNABLE;
+                }
+                break;
         }
+
+        if (curproc->handlers[i] == (void *) SIG_IGN) {
+            cancelSignal(curproc, i);
+        }
+        else if(curproc->handlers[i] !=SIG_DFL){           //user handler
+
+            memmove(&curproc->trap_backup, curproc->tf, sizeof(struct trapframe));
+            void *handler_pointer = curproc->handlers[i];
+
+            //"push" the code of the sigret injection program
+            int sigret_size = &call_sigret_syscall - &end_sigret_syscall;   //size of the "injected" program
+            curproc->tf->esp -= sigret_size;
+            void *injected_pointer = curproc->tf->esp;                    //points to the injected function's code.
+            memmove((void *) curproc->tf->esp, call_sigret_syscall, sigret_size);   //copy the code to the stack
+            //push the signum
+            curproc->tf->esp -= 4;
+            *((int *) curproc->tf->esp) = i;
+            curproc->tf->eip = handler_pointer;
+
+            //push a pointer to the injected function
+            curproc->tf->esp -= 4;
+            *((int *) curproc->tf->esp) = injected_pointer;
+            return;
+
+        }
+        curproc->mask = curproc->mask_backup;     //restore the mask
     }
+
+
+
+
+
+}
+
+
+}
+
 
 }
 
