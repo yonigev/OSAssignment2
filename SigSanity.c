@@ -2,30 +2,38 @@
 #include "user.h"
 #include "stat.h"
 
+typedef   void (*sighandler_t ) (int) ;
+
+
+
+
+
+
+
+
+int gotTen(int num){
+    printf(1,"Got signal 10\n");
+    exit();
+}
+
 void infinite(){
-    signal(3,got3);
+    sighandler_t pointer= (sighandler_t)gotTen;
+    signal(10,pointer);
+    printf(1,"got10 is: %p\n",pointer);
     while(1){
 
 
     }
 }
-void got3(){
-    printf(1,"Got signal 3\n");
-    exit();
-}
 
 int main(){
 
-
+    printf(1,"GOTTEN IS: %d\n",infinite);
     int pid1;
     if((pid1=fork())==0){
         infinite();
     }
-    else {
-        printf(1, "Child pid: %d\n", pid1);
-
-
-    }
+    printf(1,"Child pid: %d\n",pid1);
 
 
 

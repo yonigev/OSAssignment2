@@ -93,14 +93,14 @@ int sys_sigprocmask(void) {
 //Task 2.1.4
 int sys_signal(void) {
     int signum;
-    int handler;
+    int handler=7;
     //TODO:make sure 'argint' is ok
+
     if (argint(0, &signum) < 0 || argint(1,  &handler) < 0)
         return -1;
     return (int)signal(signum, (sighandler_t)handler);
 }
 
-//TODO:implement?
 int sys_sigret(void) {
     sigret();
     return 1;

@@ -130,7 +130,7 @@ int isBlocked(int signum) {
             return 0;
         return 1;
     }
-    return 0;
+    return 1;
 }
 
 //cancel a certain signal for a certain process!
@@ -146,12 +146,13 @@ check_kernel_sigs() {
     struct proc *curproc = myproc();
     if (curproc == 0 || curproc->mask == 0 || curproc->pending == 0)
         return;
-
     int i;
     //check each possible signal
     for (i = 0; i < 32; i++) {
-        if(! (hasSignal(curproc, i) && !isBlocked(i)))  //if signal i should NOT be handled right now, go to the next one
+
+        if( !(hasSignal(curproc, i) && !isBlocked(i)) )       //if signal i should NOT be handled right now, go to the next one
             continue;
+
         curproc->mask_backup = curproc->mask;
         curproc->mask = 0;
         //handle signals which require DEFAULT handling
@@ -177,6 +178,7 @@ check_kernel_sigs() {
                 break;
             default:
                 if (curproc->handlers[i] == (void *) SIG_DFL) {
+                    cprintf("i: %d, i-1: %d , i+1:%d ",curproc->handlers[i],curproc->handlers[i-1],curproc->handlers[i+1]);
                     cancelSignal(curproc, i);
                     curproc->killed = 1;
                     if (curproc->state == SLEEPING)
@@ -190,6 +192,7 @@ check_kernel_sigs() {
         }
             // custom handlers
         else if (curproc->handlers[i] != SIG_DFL) {           //user handler
+            cprintf("handling custom!!!! i: %d\n");
             memmove(curproc->trap_backup, curproc->tf, sizeof(struct trapframe));
             void *handler_pointer = curproc->handlers[i];
             //"push" the code of the sigret injection program

@@ -130,7 +130,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_sigprocmask] sys_sigprocmask,
-[SYS_signal] sys_sigprocmask,
+[SYS_signal] sys_signal,
 [SYS_sigret] sys_sigret,
 };
 
