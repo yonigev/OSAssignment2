@@ -11,7 +11,7 @@ typedef   void (*sighandler_t ) (int) ;
 
 
 
-int gotTen(int num){
+int gotTen(){
     printf(1,"Got signal 10\n");
     exit();
 }
@@ -28,7 +28,7 @@ void infinite(){
 
 int main(){
 
-    printf(1,"GOTTEN IS: %d\n",infinite);
+    printf(1,"GOTTEN IS: %d\n",gotTen);
     int pid1;
     if((pid1=fork())==0){
         infinite();

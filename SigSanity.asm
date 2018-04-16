@@ -10,7 +10,7 @@ Disassembly of section .text:
 
 
 
-int gotTen(int num){
+int gotTen(){
    0:	55                   	push   %ebp
    1:	89 e5                	mov    %esp,%ebp
    3:	83 ec 08             	sub    $0x8,%esp
@@ -38,7 +38,7 @@ void infinite(){
   30:	6a 0a                	push   $0xa
   32:	e8 6e 03 00 00       	call   3a5 <signal>
   37:	83 c4 10             	add    $0x10,%esp
-    printf(1,"got10 is: %p\n",*pointer);
+    printf(1,"got10 is: %p\n",pointer);
   3a:	83 ec 04             	sub    $0x4,%esp
   3d:	ff 75 f4             	pushl  -0xc(%ebp)
   40:	68 51 08 00 00       	push   $0x851
@@ -63,9 +63,9 @@ int main(){
   5e:	51                   	push   %ecx
   5f:	83 ec 14             	sub    $0x14,%esp
 
-    printf(1,"GOTTEN IS: %d\n",infinite);
+    printf(1,"GOTTEN IS: %d\n",gotTen);
   62:	83 ec 04             	sub    $0x4,%esp
-  65:	68 1d 00 00 00       	push   $0x1d
+  65:	68 00 00 00 00       	push   $0x0
   6a:	68 5f 08 00 00       	push   $0x85f
   6f:	6a 01                	push   $0x1
   71:	e8 16 04 00 00       	call   48c <printf>

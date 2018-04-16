@@ -557,14 +557,9 @@ uint sigprocmask(uint sigmask) {
 //Task 2.1.4
 sighandler_t signal(int signum, sighandler_t handler) {
     struct proc *curproc = myproc();
-
-
     if (curproc != 0 && signum >= 0 && signum <= 31) {
-        cprintf("SIGNALING! signal(%d , handler)\n, %d",signum,handler);
         sighandler_t oldHandler = curproc->handlers[signum];
         curproc->handlers[signum] = handler;
-        cprintf("Curproc == %d, pid: %d\n handler: %d\n",curproc,curproc->pid,curproc->handlers[signum]);
-
         return oldHandler;
     }
     return (sighandler_t)-2;
