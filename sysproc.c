@@ -84,24 +84,25 @@ sys_uptime(void) {
 
 //Task 2.1.3
 int sys_sigprocmask(void) {
-    uint sigmask;
+    int sigmask;
     if (argint(0, &sigmask) < 0)
         return -1;
-    return sigprocmask(sigmask);
+    return sigprocmask((uint)sigmask);
 }
 
 //Task 2.1.4
 int sys_signal(void) {
     int signum;
-    sighandler_t handler;
+    int handler;
     //TODO:make sure 'argint' is ok
-    if (argint(0, &signum) < 0 || argint(1, (sighandler_t) handler) < 0)
+    if (argint(0, &signum) < 0 || argint(1,  &handler) < 0)
         return -1;
-    return (void *) signal(signum, handler);
+    return (int)signal(signum, (sighandler_t)handler);
 }
 
 //TODO:implement?
 int sys_sigret(void) {
-    return sigret();
+    sigret();
+    return 1;
 
 }

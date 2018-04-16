@@ -64,7 +64,7 @@ struct proc {
     uint mask;
     uint mask_backup;
     void *handlers[32];
-    struct trapframe trap_backup;
+    struct trapframe* trap_backup;
 
 };
 

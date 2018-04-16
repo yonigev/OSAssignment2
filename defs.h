@@ -162,8 +162,10 @@ void            sigret(void);
 void            syscall(void);
 
 //sigret_injection.S to use in trap.c
-void            call_sigret_syscall(void);
-void            end_sigret_syscall(void);
+
+//void            call_sigret_syscall(void);
+//void            end_sigret_syscall(void);
+
 // timer.c
 void            timerinit(void);
 

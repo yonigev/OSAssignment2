@@ -562,7 +562,7 @@ sighandler_t signal(int signum, sighandler_t handler) {
         return oldHandler;
 
     }
-    return -2;
+    return (sighandler_t)-2;
 }
 
 
@@ -570,16 +570,11 @@ void
 sigret() {
     struct proc *curproc = myproc();
     if (curproc) {
-        memmove(curproc->tf, &curproc->trap_backup, sizeof(struct trapframe));
+        memmove(curproc->tf, curproc->trap_backup, sizeof(struct trapframe));
         curproc->mask = curproc->mask_backup;     //restore the mask
     }
 }
 
-//return 1 if process p has received signal 'signum'
-int hasSignal(struct proc *p, int signum) {
-    if ((p->pending & (1 << signum)) > 0)
-        return 1;
-    return 0;
-}
+
 
 

@@ -11,6 +11,10 @@
 // Interrupt descriptor table (shared by all CPUs).
 struct gatedesc idt[256];
 extern uint vectors[];  // in vectors.S: array of 256 entry pointers
+
+extern void* call_sigret_syscall;
+extern void* end_sigret_syscall;
+
 struct spinlock tickslock;
 uint ticks;
 
@@ -108,14 +112,24 @@ trap(struct trapframe *tf) {
         exit();
 }
 
+
+
+//return 1 if process p has received signal 'signum'
+int hasSignal(struct proc *p, int signum) {
+    if ((p->pending & (1 << signum)) > 0)
+        return 1;
+    return 0;
+}
+
 //indicates if signal 'signum' is blocked for handling
 int isBlocked(int signum) {
     struct proc *curproc = myproc();
     if (curproc != 0) {
-        if (curproc->mask & (1 << signum) > 0)
+        if ((curproc->mask & (1 << signum)) > 0)
             return 0;
         return 1;
     }
+    return 0;
 }
 
 //cancel a certain signal for a certain process!
@@ -128,14 +142,15 @@ void cancelSignal(struct proc *p, int signum) {
 //called in kernel mode
 void
 check_kernel_sigs() {
-    int i;
-    int stopped = 1;
     struct proc *curproc = myproc();
     if (curproc == 0 || curproc->mask == 0 || curproc->pending == 0)
         return;
+    int i;
+    //check each possible signal
     for (i = 0; i < 32 && hasSignal(curproc, i) && !isBlocked(i); i++) {
         curproc->mask_backup = curproc->mask;
         curproc->mask = 0;
+        //handle signals which require DEFAULT handling
         switch (i) {
             case SIGKILL:
                 if (curproc->handlers[i] == SIG_DFL) {
@@ -165,44 +180,32 @@ check_kernel_sigs() {
                 }
                 break;
         }
-
+        //if should ignore this signal
         if (curproc->handlers[i] == (void *) SIG_IGN) {
             cancelSignal(curproc, i);
         }
-        else if(curproc->handlers[i] !=SIG_DFL){           //user handler
-
-            memmove(&curproc->trap_backup, curproc->tf, sizeof(struct trapframe));
+            // custom handlers
+        else if (curproc->handlers[i] != SIG_DFL) {           //user handler
+            memmove(curproc->trap_backup, curproc->tf, sizeof(struct trapframe));
             void *handler_pointer = curproc->handlers[i];
-
             //"push" the code of the sigret injection program
             int sigret_size = &call_sigret_syscall - &end_sigret_syscall;   //size of the "injected" program
             curproc->tf->esp -= sigret_size;
-            void *injected_pointer = curproc->tf->esp;                    //points to the injected function's code.
+            void *injected_pointer = (void *) curproc->tf->esp;                    //points to the injected function's code.
             memmove((void *) curproc->tf->esp, call_sigret_syscall, sigret_size);   //copy the code to the stack
             //push the signum
             curproc->tf->esp -= 4;
             *((int *) curproc->tf->esp) = i;
-            curproc->tf->eip = handler_pointer;
-
+            curproc->tf->eip = (uint) handler_pointer;
             //push a pointer to the injected function
             curproc->tf->esp -= 4;
-            *((int *) curproc->tf->esp) = injected_pointer;
+            *((int *) curproc->tf->esp) = (int) injected_pointer;
             return;
-
         }
         curproc->mask = curproc->mask_backup;     //restore the mask
     }
-
-
-
-
-
 }
 
 
-}
-
-
-}
 
 
