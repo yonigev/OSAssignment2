@@ -71,4 +71,5 @@ add_executable(OSAssignment2
         vm.c
         wc.c
         x86.h
-        zombie.c)
+        zombie.c
+        SigSanity.c)
