@@ -131,7 +131,7 @@ check_kernel_sigs() {
     if (curproc != 0) {
         //first check for KERNEL signals
         //if this signal is pending
-        if (((curproc->pending & (1 << SIGKILL)) > 0) && !isBlocked(SIGKILL)) {
+        if (hasSignal(curproc,SIGKILL) && !isBlocked(SIGKILL)) {
             curproc->killed = 1;
             if (curproc->state == SLEEPING)
                 curproc->state = RUNNABLE;
@@ -146,7 +146,7 @@ check_kernel_sigs() {
                 //cancel SIGCONT, it should be ignored (no SIGSTOP is present)
                 curproc->pending = curproc->pending ^ (1 << SIGCONT);
             }
-        } else if (((curproc->pending & (1 << SIGSTOP)) > 0) && !isBlocked(SIGSTOP)) {
+        } else if (hasSignal(curproc,SIGSTOP) && !isBlocked(SIGSTOP)) {
             //yield();
 
         }
@@ -170,6 +170,8 @@ check_kernel_sigs() {
                     memmove(&curproc->trap_backup,curproc->tf,sizeof(struct trapframe));
                     asm{
                     //TODO: push arguments and INJECT trapret and stuff :(
+
+
 
                     }
 
