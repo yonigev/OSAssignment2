@@ -116,6 +116,7 @@ trap(struct trapframe *tf) {
 
 //return 1 if process p has received signal 'signum'
 int hasSignal(struct proc *p, int signum) {
+
     if ((p->pending & (1 << signum)) > 0)
         return 1;
     return 0;
@@ -145,9 +146,12 @@ check_kernel_sigs() {
     struct proc *curproc = myproc();
     if (curproc == 0 || curproc->mask == 0 || curproc->pending == 0)
         return;
+
     int i;
     //check each possible signal
-    for (i = 0; i < 32 && hasSignal(curproc, i) && !isBlocked(i); i++) {
+    for (i = 0; i < 32; i++) {
+        if(! (hasSignal(curproc, i) && !isBlocked(i)))  //if signal i should NOT be handled right now, go to the next one
+            continue;
         curproc->mask_backup = curproc->mask;
         curproc->mask = 0;
         //handle signals which require DEFAULT handling

@@ -492,6 +492,7 @@ kill(int pid, int signum) {
         acquire(&ptable.lock);
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             if (p->pid == pid) {
+
                 p->pending = p->pending | (1 << signum);
                 //p->killed = 1;
                 // Wake process from sleep if necessary.
