@@ -1,5 +1,9 @@
 // Routines to let C code use special x86 instructions.
+static inline int
+cas(volatile void *addr, int expected, int newval){
 
+
+}
 static inline uchar
 inb(ushort port)
 {
