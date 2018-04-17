@@ -11,19 +11,13 @@ typedef   void (*sighandler_t ) (int) ;
 
 
 
-int gotTen(){
-    printf(1,"Got signal 10\n");
-    exit();
-}
-
-void infinite(){
-    sighandler_t pointer= (sighandler_t)gotTen;
-    signal(10,pointer);
-    printf(1,"got10 is: %p\n",pointer);
-    while(1){
+void gotTen(int signum);
+void infinite();
+void handler1();
 
 
-    }
+void handler2(){
+    printf(1,"this is handler TWO!\n");
 }
 
 int main(){
@@ -37,6 +31,35 @@ int main(){
 
 
 
+    //wait();
+    exit();
+}
 
+void gotTen(int signum){
+    printf(1,"Got signal 10, changing handler to Handler1\n");
+    signal(10,(sighandler_t)handler1);
+    printf(1,"...Changed!. \n");
+//    register int sp asm ("sp");
+//    int *a=(int*)sp;
+//    printf(1,"SP IS %p", a[0]);
+    return;
+    //exit();
+}
+
+
+
+void infinite(){
+    sighandler_t pointer= (sighandler_t)gotTen;
+    printf(1,"signaling..\n");
+    signal(10,pointer);
+    printf(1,"Infinite....\n");
+    while(1){
+        printf(1,"in infinite() .........\n");
+        sleep(200);
+
+    }
+}
+void handler1(){
+    printf(1,"this is handler ONE!\n");
     exit();
 }

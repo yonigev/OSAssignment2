@@ -569,9 +569,12 @@ sighandler_t signal(int signum, sighandler_t handler) {
 void
 sigret() {
     struct proc *curproc = myproc();
+
     if (curproc) {
+
         memmove(curproc->tf, curproc->trap_backup, sizeof(struct trapframe));
         curproc->mask = curproc->mask_backup;     //restore the mask
+
     }
 }
 

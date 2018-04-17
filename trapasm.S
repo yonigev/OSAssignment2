@@ -9,7 +9,6 @@
 .globl alltraps
 .globl call_sigret_syscall
 .globl end_sigret_syscall
-
 alltraps:
   # Build trap frame.
   pushl %ds
@@ -32,7 +31,9 @@ alltraps:
 .globl trapret
 trapret:
   pushl %esp    #
+  pushal
   call check_kernel_sigs
+  popal
   addl $4, %esp #
   popal
   popl %gs
@@ -41,6 +42,8 @@ trapret:
   popl %ds
   addl $0x8, %esp  # trapno and errcode
   iret
+
+
 
 call_sigret_syscall:
     movl $SYS_sigret, %eax
