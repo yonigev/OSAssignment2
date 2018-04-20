@@ -160,7 +160,7 @@ check_kernel_sigs() {
     for (i = 0; i < 32; i++) {
 
         if(hasSignal(curproc,SIGSTOP))
-           cprintf("got stop : %d\n",curproc->pid);
+           //cprintf("got stop : %d\n",curproc->pid);
         if( !(hasSignal(curproc, i) && !isBlocked(i)) )       //if signal i should NOT be handled right now, go to the next one
             continue;
 

@@ -162,6 +162,7 @@ cont_test(){
     printf(1,"cont_test\n");
     signal(2,(signalhandler_t)4);
     int p = fork();
+    printf(1,"child is: %d\n",p);
     if (p ==0){
         sleep(10);
         sleep(10);
