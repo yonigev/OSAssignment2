@@ -141,7 +141,7 @@ stop_test(){
     int father_pid = getpid();
     int p = fork();
     if (p ==0){
-        sleep(10);
+        sleep(20);
         printf(1,"ERROR: child process not stopped!\n");
         kill(father_pid,SIGKILL);
         exit();
@@ -163,7 +163,7 @@ cont_test(){
     signal(2,(signalhandler_t)4);
     int p = fork();
     if (p ==0){
-        sleep(5);
+        sleep(100);
         printf(1,"child comparing 213\n");
         compare_file("213");
         printf(1,"child writing 3\n");
