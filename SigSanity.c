@@ -254,7 +254,7 @@ custom_handler_test(){
     else {
         sleep(100);
         kill(p, 1); //2
-        sleep(50);
+        sleep(100);
         printf(1,"parent comparing 1\n");
         compare_file("1"); //4 - making sure custom handler executed (FAILED!)
         printf(1,"parent writing 2\n");
