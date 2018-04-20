@@ -129,6 +129,9 @@ int hasSignal(struct proc *p, int signum) {
 //indicates if signal 'signum' is blocked for handling
 int isBlocked(int signum) {
     struct proc *curproc = myproc();
+    if(curproc->pid == 5){
+        cprintf("pid 5, mask: %d\n",curproc->mask);
+    }
     if (curproc != 0) {
         if ((curproc->mask & (1 << signum)) > 0)
             return 0;
