@@ -508,7 +508,7 @@ main(int argc, char *argv[])
     // stop_test();
     cont_test();
     ignore_signals_test();
-    custom_handler_test();
+    //custom_handler_test();
     multiple_handlers_test();
     //custom_cont_test();
     shell_signal_test();
