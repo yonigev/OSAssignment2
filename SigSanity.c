@@ -163,7 +163,7 @@ cont_test(){
     signal(2,(signalhandler_t)4);
     int p = fork();
     if (p ==0){
-        sleep(100);
+        sleep(200);
         printf(1,"child comparing 213\n");
         compare_file("213");
         printf(1,"child writing 3\n");
