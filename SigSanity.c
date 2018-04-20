@@ -22,13 +22,18 @@ void handler2(){
 int globalInt=0;
 int main(){
 
-    int res1=increment();
-    printf(1,"res1 is: %d\n",res1);
-    int res2=increment();
-    printf(1,"res1 is: %d\n",res2);
-    int res3=increment();    
-    printf(1,"res1 is: %d\n",res3);
-    printf(1,"globalInt is: %d\n",globalInt);
+    int pids[100];
+    int i;
+    for(i=0; i<100; i++){
+        if((pids[i]=fork())==0){
+            increment();
+            exit();
+        }
+    }
+
+    printf(1,"globalInt: %d\n",globalInt);
+
+   
 
 
 
