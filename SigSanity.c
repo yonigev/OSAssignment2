@@ -21,6 +21,7 @@ void handler2(){
     printf(1,"this is handler TWO!\n");
 }
 int globalInt=0;
+int * globalAddr=&globalInt;
 int main(){
 
     int pids[PROCNUM];
@@ -58,7 +59,7 @@ int main(){
     exit();
 }
 int increment(){
-    return cas(&globalInt,globalInt,globalInt+1);
+    return cas(globalAddr,*globalAddr,*globalAddr+1);
 }
 
 void gotTen(int signum){
