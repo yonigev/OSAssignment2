@@ -14,7 +14,7 @@ typedef   void (*sighandler_t ) (int) ;
 void gotTen(int signum);
 void infinite();
 void handler1();
-
+int increment();
 
 void handler2(){
     printf(1,"this is handler TWO!\n");
