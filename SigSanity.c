@@ -30,7 +30,7 @@ write_file(char *buffer){
     write(fd, buffer, strlen(buffer));
     close(fd);
 }
-write_file2(char *buffer){
+void write_file2(char *buffer){
     int fd = open("tmp2", O_CREATE|O_RDWR);
     write(fd, buffer, strlen(buffer));
     close(fd);
