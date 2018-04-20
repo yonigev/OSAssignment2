@@ -165,7 +165,7 @@ cont_test(){
     if (p ==0){
         sleep(10);
         sleep(10);
-        printf(1,"child comparing 213\n");
+        printf(1,"child woke up-comparing 213\n");
         compare_file("213");
         printf(1,"child writing 3\n");
         write_file("3");
@@ -177,6 +177,7 @@ cont_test(){
         exit();
     }
     else {
+        printf(1,"father stops p\n");
         kill(p, SIGSTOP);
         printf(1,"father writing 12\n");
         write_file("12");
