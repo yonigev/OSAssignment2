@@ -509,7 +509,7 @@ main(int argc, char *argv[])
     cont_test();
     ignore_signals_test();
     //custom_handler_test();
-    multiple_handlers_test();
+   // multiple_handlers_test();
     //custom_cont_test();
     shell_signal_test();
     signal_inheritance_test();
