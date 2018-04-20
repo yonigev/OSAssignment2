@@ -140,7 +140,7 @@ stop_test(){
     int father_pid = getpid();
     int p = fork();
     if (p ==0){
-        sleep(10);
+        sleep(100);
         printf(1,"ERROR: child process not stopped!\n");
         kill(father_pid,SIGKILL);
         exit();
