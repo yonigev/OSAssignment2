@@ -11,6 +11,8 @@
 #include "traps.h"
 #include "memlayout.h"
 
+#define SIG_DFL -1
+
 int flag1=0, flag2=0, flag3=0;
 char buf[4096];
 int debug = 0;
