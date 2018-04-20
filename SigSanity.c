@@ -13,7 +13,7 @@
 
 int flag1=0, flag2=0, flag3=0;
 char buf[4096];
-int debug = 0;
+int debug = 1;
 
 //Assignment 2: task 2.1.4:
 typedef void (*signalhandler_t)(int);
@@ -202,12 +202,12 @@ ignore_signals_test(){
     int father_pid = getpid();
     int p = fork();
     if (p == 0) {
-        signal(SIGKILL,(signalhandler_t)(SIG_IGN));//1 - child ignores SIGKILL
+        signal(SIGKILL,(signalhandler_t)SIG_IGN);//1 - child ignores SIGKILL
         write_file("Child didn't ignore SIGKILL"); //3 - child is supposed to print this message
         sleep(20);
         compare_file("b");
         write_file("c");
-        signal(SIGKILL,(signalhandler_t)(SIGKILL)); //4 - child restores SIGKILL handler to default (process should die)
+        signal(SIGKILL,(signalhandler_t)SIGKILL); //4 - child restores SIGKILL handler to default (process should die)
         sleep(50);//child handles SIGKILL after this line
         write_file("d");
         sleep(50);//safety wait
