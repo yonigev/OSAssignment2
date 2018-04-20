@@ -19,20 +19,34 @@ void handler1();
 void handler2(){
     printf(1,"this is handler TWO!\n");
 }
-
+int globalInt=0;
 int main(){
 
-    printf(1,"GOTTEN IS: %d\n",gotTen);
-    int pid1;
-    if((pid1=fork())==0){
-        infinite();
-    }
-    printf(1,"Child pid: %d\n",pid1);
+    int res1=increment();
+    printf(1,"res1 is: %d\n",res1);
+    int res2=increment();
+    printf(1,"res1 is: %d\n",res2);
+    int res3=increment();    
+    printf(1,"res1 is: %d\n",res3);
+
+
+
+
+    
+    // printf(1,"GOTTEN IS: %d\n",gotTen);
+    // int pid1;
+    // if((pid1=fork())==0){
+    //     infinite();
+    // }
+    // printf(1,"Child pid: %d\n",pid1);
 
 
 
     //wait();
     exit();
+}
+int increment(){
+    return cas(globalInt,globalInt+1,globalInt+1);
 }
 
 void gotTen(int signum){
