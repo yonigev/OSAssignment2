@@ -11,7 +11,6 @@
 #include "traps.h"
 #include "memlayout.h"
 
-#define SIG_DFL -1
 
 int flag1=0, flag2=0, flag3=0;
 char buf[4096];
@@ -79,7 +78,7 @@ loop3(){
 
 signalhandler_t
 custom_handler(int signum){
-    if (debug) printf(1,"Entered custom_handler\n");
+    if (1) printf(1,"Entered custom_handler\n");
     write_file("1");
     flag1 = 1;
     return 0;
@@ -238,7 +237,7 @@ custom_handler_test(){
     int p = fork();
     int n;
     if (p == 0) {
-        if ((int)(n = ((int)signal(1, (signalhandler_t)custom_handler))) != (int)SIG_DFL) {
+        if ((int)(n = ((int)signal(1, (signalhandler_t)custom_handler))) != -1) {
             printf(1,"Error: expected signal func return value is %x but got %x\n",SIG_DFL,n);
             exit();
         }
