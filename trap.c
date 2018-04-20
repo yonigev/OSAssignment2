@@ -159,8 +159,7 @@ check_kernel_sigs() {
     //check each possible signal
     for (i = 0; i < 32; i++) {
 
-        if(hasSignal(curproc,SIGSTOP))
-           //cprintf("got stop : %d\n",curproc->pid);
+        
         if( !(hasSignal(curproc, i) && !isBlocked(i)) )       //if signal i should NOT be handled right now, go to the next one
             continue;
 
@@ -185,8 +184,10 @@ check_kernel_sigs() {
                 break;
             case SIGSTOP:
                 if (curproc->handlers[i] == (void*)SIG_DFL)
-                    while ((!hasSignal(curproc, SIGCONT)) && (!hasSignal(curproc, SIGKILL)))
+                    while ((!hasSignal(curproc, SIGCONT)) && (!hasSignal(curproc, SIGKILL))){
+                        cprintf("got stop : %d, yielding\n",curproc->pid);
                         yield();
+                    }
                 break;
             default:
                 if (curproc->handlers[i] == (void *) SIG_DFL) {
