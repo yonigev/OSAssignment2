@@ -261,7 +261,8 @@ custom_handler_test(){
             exit();
         }
         sleep(100);//3 - After this sleep, the custom handler should execute
-        sleep(80);
+        printf(1,"child woke up-after writing 1 ? \n");
+        sleep(100);
         printf(1,"child comparing 2\n");
         compare_file2("2");//6
         sleep(50);
