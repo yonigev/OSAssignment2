@@ -27,7 +27,8 @@ int main(){
     int i;
     for(i=0; i<PROCNUM; i++){
         if((pids[i]=fork())==0){
-            increment();
+            printf(1,"cas res: %d\n",increment());
+            printf(1,"now globalInt: %d\n",globalInt);
             exit();
         }
     }
