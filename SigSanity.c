@@ -164,7 +164,7 @@ cont_test(){
     printf(1,"cont_test\n");
     signal(2,(signalhandler_t)4);
     int p = fork();
-    printf(1,"child is: %d\n",p);
+
     if (p ==0){
         sleep(10);
         sleep(10);
@@ -244,6 +244,7 @@ custom_handler_test(){
         }
         sleep(10);//3 - After this sleep, the custom handler should execute
         sleep(80);
+        printf(1,"child comparing 2\n");
         compare_file("2");//6
         sleep(50);
         write_file("3");//7
