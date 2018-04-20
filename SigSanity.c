@@ -56,7 +56,26 @@ compare_file(char *src){
         exit();
     }
 }
-
+void
+compare_file2(char *src){
+    int fd = open("tmp2", O_RDWR);
+    read(fd, buf, strlen(src));
+    int i, correct = 1;
+    if (debug) {
+        buf[strlen(src)] = '\0';
+        printf(1,"Comparing string %s with string %s\n",src,buf);
+    }
+    for (i = 0 ; i < strlen(src) ; i++)
+        if (*(src+i) != *(buf+i)){
+            correct = 0;
+            break;
+        }
+    close(fd);
+    if (!correct){
+        printf(1,"Test failed on compare(\"%s\")!\n",src);
+        exit();
+    }
+}
 void
 loop1(){
     volatile int i;
@@ -93,7 +112,7 @@ custom_handler(int signum){
 signalhandler_t
 custom_handler2(int signum){
     if (debug) printf(1,"Entered custom_handler2\n");
-    compare_file("1");
+    compare_file2("1");
     write_file2("2");
     flag2 = 1;
     return 0;
@@ -102,7 +121,7 @@ custom_handler2(int signum){
 signalhandler_t
 custom_handler3(int signum){
     if (debug) printf(1,"Entered custom_handler3\n");
-    compare_file("2");
+    compare_file2("2");
     write_file2("3");
     flag3 = 1;
     return 0;
@@ -244,7 +263,7 @@ custom_handler_test(){
         sleep(100);//3 - After this sleep, the custom handler should execute
         sleep(80);
         printf(1,"child comparing 2\n");
-        compare_file("2");//6
+        compare_file2("2");//6
         sleep(50);
         write_file2("3");//7
         exit();
@@ -254,11 +273,11 @@ custom_handler_test(){
         kill(p, 1); //2
         sleep(200);
         printf(1,"parent comparing 1\n");
-        compare_file("1"); //4 - making sure custom handler executed (FAILED!)
+        compare_file2("1"); //4 - making sure custom handler executed (FAILED!)
         printf(1,"parent writing 2\n");
         write_file2("2");//5
         wait();
-        compare_file("3");//8
+        compare_file2("3");//8
         printf(1,"custom_handler_test passed\n");
     }
 }
