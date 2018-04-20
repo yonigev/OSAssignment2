@@ -68,11 +68,11 @@ myproc(void) {
 
 int
 allocpid(void) {
-    int pid;
-    acquire(&ptable.lock);
-    pid = nextpid++;
-    release(&ptable.lock);
-    return pid;
+    int local_pid;
+    do {  
+        local_pid=nextpid; 
+    }while(!cas(&nextpid,local_pid,local_pid+1));
+    return local_pid +  1;
 }
 
 
@@ -85,7 +85,7 @@ static struct proc *
 allocproc(void) {
     struct proc *p;
     char *sp;
-    
+
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
         if (cas(&(p->state),UNUSED,EMBRYO)){
             goto found;
