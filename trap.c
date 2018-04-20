@@ -130,7 +130,7 @@ int hasSignal(struct proc *p, int signum) {
 int isBlocked(int signum) {
     struct proc *curproc = myproc();
     if(curproc->pid == 5){
-        cprintf("pid 5, mask: %d\n",curproc->mask);
+        cprintf("pid 5, mask: %d @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n",curproc->mask);
     }
     if (curproc != 0) {
         if ((curproc->mask & (1 << signum)) > 0)
