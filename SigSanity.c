@@ -2,6 +2,7 @@
 #include "user.h"
 #include "stat.h"
 #include "x86.h"
+#define PROCNUM 2
 typedef   void (*sighandler_t ) (int) ;
 
 
@@ -22,16 +23,16 @@ void handler2(){
 int globalInt=0;
 int main(){
 
-    int pids[100];
+    int pids[PROCNUM];
     int i;
-    for(i=0; i<100; i++){
+    for(i=0; i<PROCNUM; i++){
         if((pids[i]=fork())==0){
             increment();
             exit();
         }
     }
     
-    for(i=0; i<100; i++){
+    for(i=0; i<PROCNUM; i++){
         wait();
     }
     
