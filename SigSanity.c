@@ -30,6 +30,11 @@ int main(){
             exit();
         }
     }
+    
+    for(i=0; i<100; i++){
+        wait();
+    }
+    
 
     printf(1,"globalInt: %d\n",globalInt);
 
