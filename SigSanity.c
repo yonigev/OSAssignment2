@@ -236,7 +236,7 @@ custom_handler_test(){
     int p = fork();
     int n;
     if (p == 0) {
-        if ((int)(n = ((int)signal(1, (signalhandler_t)custom_handler))) != SIG_DFL) {
+        if ((int)(n = ((int)signal(1, (signalhandler_t)custom_handler))) != (int)SIG_DFL) {
             printf(1,"Error: expected signal func return value is %x but got %x\n",SIG_DFL,n);
             exit();
         }
