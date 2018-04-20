@@ -81,6 +81,7 @@ custom_handler(int signum){
     if (1) printf(1,"Entered custom_handler\n");
     write_file("1");
     flag1 = 1;
+    if (1) printf(1,"Finishing custom_handler\n");
     return 0;
 }
 
@@ -249,10 +250,10 @@ custom_handler_test(){
         exit();
     }
     else {
-        sleep(5);
+        sleep(100);
         kill(p, 1); //2
         sleep(50);
-        compare_file("1"); //4 - making sure custom handler executed
+        compare_file("1"); //4 - making sure custom handler executed (FAILED!)
         write_file("2");//5
         wait();
         compare_file("3");//8
