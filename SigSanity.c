@@ -1,7 +1,7 @@
 #include "types.h"
 #include "user.h"
 #include "stat.h"
-
+#include "x86.h"
 typedef   void (*sighandler_t ) (int) ;
 
 
