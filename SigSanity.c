@@ -202,6 +202,7 @@ ignore_signals_test(){
     int father_pid = getpid();
     int p = fork();
     if (p == 0) {
+        
         signal(SIGKILL,(signalhandler_t)SIG_IGN);//1 - child ignores SIGKILL
         write_file("Child didn't ignore SIGKILL"); //3 - child is supposed to print this message
         sleep(20);
@@ -216,6 +217,7 @@ ignore_signals_test(){
         exit();
     }
     else {
+        printf(1,"CHILD ID: %d\n",p);
         sleep(5);
         kill(p,SIGKILL);//2 - father tries to send SIGKILL to child, should be ignored
         compare_file("Child didn't ignore SIGKILL");
