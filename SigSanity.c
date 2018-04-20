@@ -78,10 +78,11 @@ loop3(){
 
 signalhandler_t
 custom_handler(int signum){
-    if (1) printf(1,"Entered custom_handler\n");
+    printf(1,"Entered custom_handler\n");
     write_file("1");
+    printf(1,"wrote 1\n");
     flag1 = 1;
-    if (1) printf(1,"Finishing custom_handler\n");
+    printf(1,"Finishing custom_handler\n");
     return 0;
 }
 
