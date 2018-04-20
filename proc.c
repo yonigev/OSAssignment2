@@ -141,7 +141,7 @@ userinit(void) {
     p->tf->eflags = FL_IF;
     p->tf->esp = PGSIZE;
     p->tf->eip = 0;  // beginning of initcode.S
-    p->mask=~0;     //at first, handle all signals.
+    p->mask=0xffffffff;     //at first, handle all signals.
     p->pending=0;
     safestrcpy(p->name, "initcode", sizeof(p->name));
     p->cwd = namei("/");
