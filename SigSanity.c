@@ -13,7 +13,7 @@
 
 int flag1=0, flag2=0, flag3=0;
 char buf[4096];
-int debug = 1;
+int debug = 0;
 
 //Assignment 2: task 2.1.4:
 typedef void (*signalhandler_t)(int);

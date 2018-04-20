@@ -145,6 +145,24 @@ void cancelSignal(struct proc *p, int signum) {
     }
 }
 
+
+void handle_SIGSTOP(struct proc* curproc){
+
+    while ((!hasSignal(curproc, SIGCONT)) && (!hasSignal(curproc, SIGKILL))){
+        yield();
+    }
+}
+void handle_SIGKILL(struct proc* curproc){
+     curproc->killed = 1;
+    if (curproc->state == SLEEPING)
+        curproc->state = RUNNABLE;
+}
+void handle_SIGCONT(struct proc* curproc){
+  if (hasSignal(curproc, SIGSTOP)){
+        cancelSignal(curproc, SIGSTOP);
+  }
+    cancelSignal(curproc, SIGCONT);  
+}
 //called in kernel mode
 void
 check_kernel_sigs() {
@@ -170,32 +188,22 @@ check_kernel_sigs() {
 
         switch (i) {
             case SIGKILL:
-                if (curproc->handlers[i] == (void*)SIG_DFL) {
-                    curproc->killed = 1;
-                    if (curproc->state == SLEEPING)
-                        curproc->state = RUNNABLE;
+                if (curproc->handlers[i] == (void*)SIG_DFL ||  curproc->handlers[i] == (void*)SIGKILL ) {
+                    handle_SIGKILL(curproc);
                 }
                 break;
             case SIGCONT:
-                if (curproc->handlers[i] == (void*)SIG_DFL) {
-                    if (hasSignal(curproc, SIGSTOP))
-                        cancelSignal(curproc, SIGSTOP);
-                    cancelSignal(curproc, SIGCONT);
+                if (curproc->handlers[i] == (void*)SIG_DFL || curproc->handlers[i] == (void*)SIGCONT) {
+                    handle_SIGCONT(curproc);
                 }
                 break;
             case SIGSTOP:
-                if (curproc->handlers[i] == (void*)SIG_DFL)
-                    while ((!hasSignal(curproc, SIGCONT)) && (!hasSignal(curproc, SIGKILL))){
-                        yield();
-                    }
+                if (curproc->handlers[i] == (void*)SIG_DFL || curproc->handlers[i] == (void*)SIGSTOP)
+                    handle_SIGSTOP(curproc);
                 break;
             default:
-                if (curproc->handlers[i] == (void *) SIG_DFL) {
-
-                    cancelSignal(curproc, i);
-                    curproc->killed = 1;
-                    if (curproc->state == SLEEPING)
-                        curproc->state = RUNNABLE;
+                if (curproc->handlers[i] == (void *) SIG_DFL) { //if default handler & a user signal, kill.
+                    handle_SIGKILL(curproc);
                 }
                 break;
         }
@@ -205,28 +213,37 @@ check_kernel_sigs() {
         }
             // custom handlers
         else if (curproc->handlers[i] != (void*)SIG_DFL) {           //user handler
+            switch(curproc->handlers[i]){
+                case SIGKILL:
+                    handle_SIGKILL(curproc);
+                    break;
+                case SIGCONT:
+                    handle_SIGCONT(curproc);
+                    break;
+                case SIGSTOP:
+                    handle_SIGSTOP(curproc);
+                    break;
+                default:
+                    memmove(curproc->trap_backup, curproc->tf, sizeof(struct trapframe));
+                    void *handler_pointer = curproc->handlers[i];
+                    //"push" the code of the sigret injection program
+                    uint sigret_size = (uint)&end_sigret_syscall - (uint)&call_sigret_syscall;   //size of the "injected" program
+                    curproc->tf->esp -= sigret_size;
+                    void *injected_pointer = (void *) curproc->tf->esp;                    //points to the injected function's code.
+                    memmove((void *) curproc->tf->esp, call_sigret_syscall, sigret_size);   //copy the code to the stack
+                    //push the signum
+                    curproc->tf->esp -= 4;
+                    *((int *) curproc->tf->esp) = i;
+                    curproc->tf->eip = (uint) handler_pointer;
+                    //push a pointer to the injected function
+                    curproc->tf->esp -= 4;
+                    *((int *) curproc->tf->esp) = (int) injected_pointer;
+                    cancelSignal(curproc,i);            //cancel the signal, it's handled right now.
+                    return;
+                break;
+            }
 
-
-            memmove(curproc->trap_backup, curproc->tf, sizeof(struct trapframe));
-
-            void *handler_pointer = curproc->handlers[i];
-            //"push" the code of the sigret injection program
-            uint sigret_size = (uint)&end_sigret_syscall - (uint)&call_sigret_syscall;   //size of the "injected" program
-            curproc->tf->esp -= sigret_size;
-            void *injected_pointer = (void *) curproc->tf->esp;                    //points to the injected function's code.
-
-            memmove((void *) curproc->tf->esp, call_sigret_syscall, sigret_size);   //copy the code to the stack
-
-
-            //push the signum
-            curproc->tf->esp -= 4;
-            *((int *) curproc->tf->esp) = i;
-            curproc->tf->eip = (uint) handler_pointer;
-            //push a pointer to the injected function
-            curproc->tf->esp -= 4;
-            *((int *) curproc->tf->esp) = (int) injected_pointer;
-            cancelSignal(curproc,i);            //cancel the signal, it's handled right now.
-            return;
+            
         }
         curproc->mask = curproc->mask_backup;     //restore the mask
     }
