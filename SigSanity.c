@@ -79,7 +79,7 @@ loop3(){
 signalhandler_t
 custom_handler(int signum){
     printf(1,"Entered custom_handler\n");
-    //write_file("1");
+    write_file("1");
     printf(1,"wrote 1\n");
     flag1 = 1;
     return 0;
