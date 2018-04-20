@@ -21,22 +21,9 @@ void handler2(){
     printf(1,"this is handler TWO!\n");
 }
 int globalInt=0;
-int * globalAddr=&globalInt;
 int main(){
 
-    int pids[PROCNUM];
-    int i;
-    for(i=0; i<PROCNUM; i++){
-        if((pids[i]=fork())==0){
-            printf(1,"cas res: %d\n",increment());
-            printf(1,"now globalInt: %d\n",globalInt);
-            exit();
-        }
-    }
     
-    for(i=0; i<PROCNUM; i++){
-        wait();
-    }
     
 
     printf(1,"globalInt: %d\n",globalInt);
@@ -59,7 +46,7 @@ int main(){
     exit();
 }
 int increment(){
-    return cas(globalAddr,*globalAddr,*globalAddr+1);
+    return cas(&globalInt,globalInt,globalInt+1);
 }
 
 void gotTen(int signum){
