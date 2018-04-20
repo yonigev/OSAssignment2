@@ -79,10 +79,9 @@ loop3(){
 signalhandler_t
 custom_handler(int signum){
     printf(1,"Entered custom_handler\n");
-    write_file("1");
+    //write_file("1");
     printf(1,"wrote 1\n");
     flag1 = 1;
-    printf(1,"Finishing custom_handler\n");
     return 0;
 }
 
@@ -220,7 +219,6 @@ ignore_signals_test(){
         exit();
     }
     else {
-        printf(1,"CHILD ID: %d\n",p);
         sleep(5);
         kill(p,SIGKILL);//2 - father tries to send SIGKILL to child, should be ignored
         compare_file("Child didn't ignore SIGKILL");
@@ -252,7 +250,7 @@ custom_handler_test(){
         exit();
     }
     else {
-        sleep(100);
+        //sleep(100);
         kill(p, 1); //2
         sleep(100);
         printf(1,"parent comparing 1\n");
