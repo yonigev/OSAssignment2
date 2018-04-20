@@ -162,8 +162,10 @@ check_kernel_sigs() {
         if(hasSignal(curproc,SIGSTOP) && curproc->pid == 5)
            cprintf("got stop : %d!!!!!!!!\n",curproc->pid);
 
-        if( !(hasSignal(curproc, i) && !isBlocked(i)) )       //if signal i should NOT be handled right now, go to the next one
+        if( !(hasSignal(curproc, i) && !isBlocked(i)) ){       //if signal i should NOT be handled right now, go to the next one
+            cprintf("continuing : %d@@@@@@@@\n",curproc->pid);
             continue;
+        }
 
         curproc->mask_backup = curproc->mask;
         curproc->mask = 0;
