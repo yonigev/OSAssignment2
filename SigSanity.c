@@ -185,6 +185,7 @@ cont_test(){
         compare_file("12");
         printf(1,"father writing 213\n");
         write_file("213");
+        sleep(20);
         kill(p, SIGCONT);
         wait();
         compare_file("3");
