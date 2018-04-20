@@ -13,7 +13,7 @@
 
 int flag1=0, flag2=0, flag3=0;
 char buf[4096];
-int debug = 1;
+int debug = 0;
 
 //Assignment 2: task 2.1.4:
 typedef void (*signalhandler_t)(int);
@@ -136,12 +136,12 @@ kill_test(){
 }
 
 void
-stop_test(){h
+stop_test(){
     printf(1,"stop_test\n");
     int father_pid = getpid();
     int p = fork();
     if (p ==0){
-        sleep(100);
+        sleep(10);
         printf(1,"ERROR: child process not stopped!\n");
         kill(father_pid,SIGKILL);
         exit();
@@ -164,7 +164,9 @@ cont_test(){
     int p = fork();
     if (p ==0){
         sleep(5);
+        printf(1,"child comparing 213\n");
         compare_file("213");
+        printf(1,"child writing 3\n");
         write_file("3");
         /*   int p1 = fork();
          if (p1 == 0) {
