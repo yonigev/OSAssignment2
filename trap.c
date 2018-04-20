@@ -168,21 +168,21 @@ check_kernel_sigs() {
 
         switch (i) {
             case SIGKILL:
-                if (curproc->handlers[i] == SIG_DFL) {
+                if (curproc->handlers[i] == (void*)SIG_DFL) {
                     curproc->killed = 1;
                     if (curproc->state == SLEEPING)
                         curproc->state = RUNNABLE;
                 }
                 break;
             case SIGCONT:
-                if (curproc->handlers[i] == SIG_DFL) {
+                if (curproc->handlers[i] == (void*)SIG_DFL) {
                     if (hasSignal(curproc, SIGSTOP))
                         cancelSignal(curproc, SIGSTOP);
                     cancelSignal(curproc, SIGCONT);
                 }
                 break;
             case SIGSTOP:
-                if (curproc->handlers[i] == SIG_DFL)
+                if (curproc->handlers[i] == (void*)SIG_DFL)
                     while ((!hasSignal(curproc, SIGCONT)) && (!hasSignal(curproc, SIGKILL)))
                         yield();
                 break;
@@ -201,7 +201,7 @@ check_kernel_sigs() {
             cancelSignal(curproc, i);
         }
             // custom handlers
-        else if (curproc->handlers[i] != SIG_DFL) {           //user handler
+        else if (curproc->handlers[i] != (void*)SIG_DFL) {           //user handler
 
 
             memmove(curproc->trap_backup, curproc->tf, sizeof(struct trapframe));
