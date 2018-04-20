@@ -129,9 +129,7 @@ int hasSignal(struct proc *p, int signum) {
 //indicates if signal 'signum' is blocked for handling
 int isBlocked(int signum) {
     struct proc *curproc = myproc();
-    if(curproc->pid == 5){
-        cprintf("pid 5, mask: %d @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n",curproc->mask);
-    }
+    
     if (curproc != 0) {
         if ((curproc->mask & (1 << signum)) > 0)
             return 0;
@@ -162,11 +160,7 @@ check_kernel_sigs() {
     //check each possible signal
     for (i = 0; i < 32; i++) {
 
-        if(hasSignal(curproc,SIGSTOP) && curproc->pid == 5)
-           cprintf("got stop : %d!!!!!!!!\n",curproc->pid);
-
         if( !(hasSignal(curproc, i) && !isBlocked(i)) ){       //if signal i should NOT be handled right now, go to the next one
-            cprintf("continuing : %d@@@@@@@@\n",curproc->pid);
             continue;
         }
 
@@ -192,7 +186,6 @@ check_kernel_sigs() {
             case SIGSTOP:
                 if (curproc->handlers[i] == (void*)SIG_DFL)
                     while ((!hasSignal(curproc, SIGCONT)) && (!hasSignal(curproc, SIGKILL))){
-                        cprintf("got stop : %d, yielding\n",curproc->pid);
                         yield();
                     }
                 break;
