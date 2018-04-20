@@ -22,8 +22,8 @@ exec(char *path, char **argv)
   //reset signal handlers
   if(curproc!=0){
     for(i=0; i<32; i++){
-      if(curproc->handlers[i] != SIG_DFL && curproc->handlers[i] != (void*)SIG_IGN )
-        curproc->handlers[i]=SIG_DFL;
+      if(curproc->handlers[i] != (void*)SIG_DFL && curproc->handlers[i] != (void*)SIG_IGN )
+        curproc->handlers[i]=(void*)SIG_DFL;
     }
   }
   begin_op();
