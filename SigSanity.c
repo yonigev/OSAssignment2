@@ -477,8 +477,8 @@ Various_signalhandler_tests(){
 int
 main(int argc, char *argv[])
 {
-    kill_test();
-    stop_test();
+    // kill_test();
+    // stop_test();
     cont_test();
     ignore_signals_test();
     custom_handler_test();
