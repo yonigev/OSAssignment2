@@ -37,8 +37,9 @@ struct context {
     uint eip;
 };
 
-//declaration for hasSignal function
+//declaration for hasSignal & isBlocked functions
 int hasSignal(struct proc *p, int signum);
+int isBlocked(int signum);
 
 enum procstate {
     UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE
