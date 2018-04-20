@@ -46,7 +46,7 @@ int main(){
     exit();
 }
 int increment(){
-    return cas(&globalInt,globalInt+1,globalInt+1);
+    return cas(&globalInt,globalInt,globalInt+1);
 }
 
 void gotTen(int signum){
