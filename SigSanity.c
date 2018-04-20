@@ -28,7 +28,7 @@ int main(){
     printf(1,"res1 is: %d\n",res2);
     int res3=increment();    
     printf(1,"res1 is: %d\n",res3);
-
+    printf(1,"globalInt is: %d\n",globalInt);
 
 
 
