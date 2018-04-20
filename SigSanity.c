@@ -344,7 +344,7 @@ shell_signal_test(){
     printf(1,"shell_signal_test\n");
     int p = fork();
     if (p == 0) {
-        sigprocmask(~(1<<22));
+        sigprocmask (~(~(1<<22)));
         exec("sh",(char*[]){ "sh", 0 });
         exit();
     }
