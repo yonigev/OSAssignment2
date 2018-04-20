@@ -30,6 +30,11 @@ write_file(char *buffer){
     write(fd, buffer, strlen(buffer));
     close(fd);
 }
+write_file2(char *buffer){
+    int fd = open("tmp2", O_CREATE|O_RDWR);
+    write(fd, buffer, strlen(buffer));
+    close(fd);
+}
 
 void
 compare_file(char *src){
@@ -79,7 +84,7 @@ loop3(){
 signalhandler_t
 custom_handler(int signum){
     printf(1,"Entered custom_handler\n");
-    write_file("1");
+    write_file2("1");
     printf(1,"wrote 1\n");
     flag1 = 1;
     return 0;
@@ -89,7 +94,7 @@ signalhandler_t
 custom_handler2(int signum){
     if (debug) printf(1,"Entered custom_handler2\n");
     compare_file("1");
-    write_file("2");
+    write_file2("2");
     flag2 = 1;
     return 0;
 }
@@ -98,7 +103,7 @@ signalhandler_t
 custom_handler3(int signum){
     if (debug) printf(1,"Entered custom_handler3\n");
     compare_file("2");
-    write_file("3");
+    write_file2("3");
     flag3 = 1;
     return 0;
 }
@@ -106,7 +111,7 @@ custom_handler3(int signum){
 signalhandler_t
 custom_handler4(int signum){
     if (debug) printf(1,"Entered custom_handler4\n");
-    write_file("1");
+    write_file2("1");
     flag1 = 1;
     kill(getpid(),29);
     return 0;
@@ -189,6 +194,7 @@ cont_test(){
         compare_file("3");
     }
     printf(1,"cont_test passed\n");
+        
 }
 
 
@@ -240,7 +246,7 @@ custom_handler_test(){
         printf(1,"child comparing 2\n");
         compare_file("2");//6
         sleep(50);
-        write_file("3");//7
+        write_file2("3");//7
         exit();
     }
     else {
@@ -250,7 +256,7 @@ custom_handler_test(){
         printf(1,"parent comparing 1\n");
         compare_file("1"); //4 - making sure custom handler executed (FAILED!)
         printf(1,"parent writing 2\n");
-        write_file("2");//5
+        write_file2("2");//5
         wait();
         compare_file("3");//8
         printf(1,"custom_handler_test passed\n");
