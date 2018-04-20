@@ -13,7 +13,7 @@
 
 int flag1=0, flag2=0, flag3=0;
 char buf[4096];
-int debug = 0;
+int debug = 1;
 
 //Assignment 2: task 2.1.4:
 typedef void (*signalhandler_t)(int);
@@ -42,6 +42,7 @@ compare_file(char *src){
     for (i = 0 ; i < strlen(src) ; i++)
         if (*(src+i) != *(buf+i)){
             correct = 0;
+            break;
         }
     close(fd);
     if (!correct){
@@ -135,7 +136,7 @@ kill_test(){
 }
 
 void
-stop_test(){
+stop_test(){h
     printf(1,"stop_test\n");
     int father_pid = getpid();
     int p = fork();
@@ -174,9 +175,12 @@ cont_test(){
     }
     else {
         kill(p, SIGSTOP);
+        printf(1,"father writing 12\n");
         write_file("12");
         sleep(100);
+        printf(1,"father comparing to 12\n");
         compare_file("12");
+        printf(1,"father writing 213\n");
         write_file("213");
         kill(p, SIGCONT);
         wait();
