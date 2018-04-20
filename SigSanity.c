@@ -168,9 +168,7 @@ cont_test(){
     if (p ==0){
         sleep(10);
         sleep(10);
-        printf(1,"child woke up-comparing 213\n");
         compare_file("213");
-        printf(1,"child writing 3\n");
         write_file("3");
         /*   int p1 = fork();
          if (p1 == 0) {
@@ -180,14 +178,10 @@ cont_test(){
         exit();
     }
     else {
-        printf(1,"father stops p\n");
         kill(p, SIGSTOP);
-        printf(1,"father writing 12\n");
         write_file("12");
         sleep(100);
-        printf(1,"father comparing to 12\n");
         compare_file("12");
-        printf(1,"father writing 213\n");
         write_file("213");
         sleep(20);
         kill(p, SIGCONT);
@@ -250,9 +244,9 @@ custom_handler_test(){
         exit();
     }
     else {
-        //sleep(100);
-        kill(p, 1); //2
         sleep(100);
+        kill(p, 1); //2
+        sleep(200);
         printf(1,"parent comparing 1\n");
         compare_file("1"); //4 - making sure custom handler executed (FAILED!)
         printf(1,"parent writing 2\n");
