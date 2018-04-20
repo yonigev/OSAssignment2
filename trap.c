@@ -211,9 +211,9 @@ check_kernel_sigs() {
         if (curproc->handlers[i] == (void *) SIG_IGN) {
             cancelSignal(curproc, i);
         }
-            // custom handlers
+        // custom handlers
         else if (curproc->handlers[i] != (void*)SIG_DFL) {           //user handler
-            switch(curproc->handlers[i]){
+            switch((int)curproc->handlers[i]){
                 case SIGKILL:
                     handle_SIGKILL(curproc);
                     break;
