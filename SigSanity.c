@@ -237,7 +237,7 @@ custom_handler_test(){
     int n;
     if (p == 0) {
         if ((int)(n = ((int)signal(1, (signalhandler_t)custom_handler))) != SIG_DFL) {
-            printf(1,"Error: expected signal func return value is 14 but got %d\n",n);
+            printf(1,"Error: expected signal func return value is %x but got %x\n",SIG_DFL,n);
             exit();
         }
         sleep(10);//3 - After this sleep, the custom handler should execute
