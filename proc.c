@@ -563,13 +563,14 @@ scheduler(void) {
                 switchuvm(p);
                 cprintf("switching to : %d, state: %d\n",p->pid,p->state);
                 cas(&(p->state),-RUNNING,RUNNING);
+                cprintf("REALLY! switching to : %d, state: %d\n",p->pid,p->state);
+                swtch(&(c->scheduler), p->context);
+                switchkvm();
+                // Process is done running for now.
+                // It should have changed its p->state before coming back.
+                c->proc = 0;
             }
-            cprintf("REALLY! switching to : %d, state: %d\n",p->pid,p->state);
-            swtch(&(c->scheduler), p->context);
-            switchkvm();
-            // Process is done running for now.
-            // It should have changed its p->state before coming back.
-            c->proc = 0;
+            
         }
         //release(&ptable.lock);
         popcli();
