@@ -185,7 +185,8 @@ userinit(void) {
     // run this process. the acquire forces the above
     // writes to be visible, and the lock is also needed
     // because the assignment might not be atomic.
-    acquire(&ptable.lock);
+    //acquire(&ptable.lock);
+    pushcli();
     //set Default handler
     memset(p->handlers, SIG_DFL, 32 * sizeof(void *));
 
