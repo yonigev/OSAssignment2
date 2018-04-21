@@ -275,9 +275,9 @@ exit(void) {
         //TODO:USE CAS HERE
         // Pass abandoned children to init.
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            //if (p->parent == curproc) {
-            if (cas(&(p->parent),(int)curproc,(int)initproc)){
-                //p->parent = initproc;
+            if (p->parent == curproc) {
+            //if (cas(&(p->parent),(int)curproc,(int)initproc)){
+                p->parent = initproc;
                 //TODO: check if also -ZOMBIE needed
                 if (p->state == ZOMBIE || p->state == -ZOMBIE)
                     wakeup1(initproc);
@@ -477,9 +477,9 @@ sleep(void *chan, struct spinlock* lk) {
     sched();
     // Tidy up.
     p->chan = 0;
-    popcli();
     if(lk !=0)
         acquire(lk);
+    popcli();
         
     }
 
