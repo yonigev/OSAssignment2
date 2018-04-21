@@ -377,9 +377,9 @@ scheduler(void) {
              else{
                 c->proc = p;
                 switchuvm(p);
-                cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
+                //cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
                 cas(&(p->state),-RUNNING,RUNNING);
-                cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
+               // cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
                 swtch(&(c->scheduler), p->context);
                 switchkvm();
                 // Process is done running for now.
@@ -473,14 +473,15 @@ sleep(void *chan, struct spinlock* lk) {
     // so it's okay to release lk.
     
     pushcli();
-    if(lk != 0){
-        release(lk);
-    }
-   if(cas(&(p->state),RUNNING,-SLEEPING)){
+    if(cas(&(p->state),RUNNING,-SLEEPING)){
         // Go to sleep.
         p->chan = chan;
         cas(&(p->state),-SLEEPING,SLEEPING);
     }
+    if(lk != 0){
+        release(lk);
+    }
+  
     sched();
     // Tidy up.
     p->chan = 0;
