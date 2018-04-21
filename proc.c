@@ -276,7 +276,7 @@ exit(void) {
         // Pass abandoned children to init.
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             //if (p->parent == curproc) {
-            if (cas(&(p->parent),curproc,initproc)){
+            if (cas(&(p->parent),(int)curproc,(int)initproc)){
                 //p->parent = initproc;
                 //TODO: check if also -ZOMBIE needed
                 if (p->state == ZOMBIE || p->state == -ZOMBIE)
