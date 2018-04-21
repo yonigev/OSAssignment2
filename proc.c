@@ -158,40 +158,6 @@ allocproc(void) {
 // Set up first user process.
 void
 userinit(void) {
-    //  struct proc *p;
-    // extern char _binary_initcode_start[], _binary_initcode_size[];
-
-    // p = allocproc();
-
-    // initproc = p;
-    // if ((p->pgdir = setupkvm()) == 0)
-    //     panic("userinit: out of memory?");
-    // inituvm(p->pgdir, _binary_initcode_start, (int) _binary_initcode_size);
-    // p->sz = PGSIZE;
-    // memset(p->tf, 0, sizeof(*p->tf));
-    // p->tf->cs = (SEG_UCODE << 3) | DPL_USER;
-    // p->tf->ds = (SEG_UDATA << 3) | DPL_USER;
-    // p->tf->es = p->tf->ds;
-    // p->tf->ss = p->tf->ds;
-    // p->tf->eflags = FL_IF;
-    // p->tf->esp = PGSIZE;
-    // p->tf->eip = 0;  // beginning of initcode.S
-    // p->mask=0xffffffff;     //at first, handle all signals.
-    // p->pending=0;
-    // safestrcpy(p->name, "initcode", sizeof(p->name));
-    // p->cwd = namei("/");
-
-    // // this assignment to p->state lets other cores
-    // // run this process. the acquire forces the above
-    // // writes to be visible, and the lock is also needed
-    // // because the assignment might not be atomic.
-    // acquire(&ptable.lock);
-    // //set Default handler
-    // memset(p->handlers, SIG_DFL, 32 * sizeof(void *));
-
-    // p->state = RUNNABLE;
-
-    // release(&ptable.lock);
     struct proc *p;
     extern char _binary_initcode_start[], _binary_initcode_size[];
 
@@ -229,7 +195,6 @@ userinit(void) {
     //set Default handler
     if(cas(&(p->state),EMBRYO,-RUNNABLE)){
         memset(p->handlers, SIG_DFL, 32 * sizeof(void *));
-        cprintf("state- %d\n",p->state);
         cas(&(p->state),-RUNNABLE,RUNNABLE);
     }
     //release(&ptable.lock);
