@@ -69,7 +69,7 @@ myproc(void) {
 int
 allocpid(void) {
     int local_pid;
-    do {  
+    do{  
         local_pid=nextpid; 
     }while(!cas(&nextpid,local_pid,local_pid+1));
     return local_pid +  1;
@@ -338,7 +338,7 @@ wait(void) {
         }
         //TODO:use CAS and lose ptable.lock parameter VV
         // Wait for children to exit.  (See wakeup1 call in proc_exit.)
-        sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+        sleep(curproc, (struct spinlock*)0);  //DOC: wait-sleep
     }
 }
 
@@ -401,8 +401,8 @@ sched(void) {
     int intena;
     struct proc *p = myproc();
 
-    if (!holding(&ptable.lock))
-        panic("sched ptable.lock");
+    // if (!holding(&ptable.lock))
+    //     panic("sched ptable.lock");
     if (mycpu()->ncli != 1)
         panic("sched locks");
     if (p->state == RUNNING)
@@ -450,13 +450,11 @@ forkret(void) {
 // Atomically release lock and sleep on chan.
 // Reacquires lock when awakened.
 void
-sleep(void *chan) {
+sleep(void *chan, struct spinlock* lock) {
     struct proc *p = myproc();
 
     if (p == 0)
         panic("sleep");
-
-    
 
     // Must acquire ptable.lock in order to
     // change p->state and then call sched.
@@ -464,25 +462,17 @@ sleep(void *chan) {
     // guaranteed that we won't miss any wakeup
     // (wakeup runs with ptable.lock locked),
     // so it's okay to release lk.
-    if (lk != &ptable.lock) {  //DOC: sleeplock0
-        //acquire(&ptable.lock);  //DOC: sleeplock1
-        pushcli();
-        release(lk);
-    }
-    // Go to sleep.
-    p->chan = chan;
-    p->state = SLEEPING;
-
-    sched();
-
-    // Tidy up.
-    p->chan = 0;
-
-    // Reacquire original lock.
-    if (lk != &ptable.lock) {  //DOC: sleeplock2
-        //release(&ptable.lock);
+   
+    pushcli();
+   
+   if(cas(&(p->state),RUNNING,-SLEEPING)){
+        // Go to sleep.
+        p->chan = chan;
+        cas(&(p->state),-SLEEPING,SLEEPING);
+        sched();
+        // Tidy up.
+        p->chan = 0;
         popcli();
-        acquire(lk);
     }
 }
 
@@ -493,9 +483,14 @@ static void
 wakeup1(void *chan) {
     struct proc *p;
 
-    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-        if (p->state == SLEEPING && p->chan == chan)
-            p->state = RUNNABLE;
+    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->chan == chan){
+            cas(&(p->state),SLEEPING,RUNNABLE);
+        }
+    }
+
+        // if (p->state == SLEEPING && p->chan == chan)
+        //     p->state = RUNNABLE;
 }
 
 // Wake up all processes sleeping on chan.
@@ -508,6 +503,15 @@ wakeup(void *chan) {
     popcli();
 }
 
+
+//sets a signal 'signum' to process p, Atomically
+void
+atomic_set_signal(struct proc* p,int signum){
+    int local_pending;
+    do{  
+        local_pending=p->pending; 
+    }while(!cas(&p->pending,local_pending,local_pending | (1 << signum)));
+}
 // Kill the process with the given pid.
 // Process won't exit until it returns
 // to user space (see trap in trap.c).
@@ -520,12 +524,7 @@ kill(int pid, int signum) {
         pushcli();
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             if (p->pid == pid) {
-
-                p->pending = p->pending | (1 << signum);
-                //p->killed = 1;
-                // Wake process from sleep if necessary.
-                //if(p->state == SLEEPING)
-                //  p->state = RUNNABLE;
+               atomic_set_signal(p,signum);               
                 //release(&ptable.lock);
                 popcli();
                 return 0;
