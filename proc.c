@@ -467,16 +467,17 @@ sleep(void *chan, struct spinlock* lock) {
     // so it's okay to release lk.
     
     pushcli();
-   
    if(cas(&(p->state),RUNNING,-SLEEPING)){
         // Go to sleep.
         p->chan = chan;
         cas(&(p->state),-SLEEPING,SLEEPING);
-        sched();
-        // Tidy up.
-        p->chan = 0;
-        popcli();
     }
+    sched();
+    // Tidy up.
+    p->chan = 0;
+    
+    popcli();
+
 }
 
 //PAGEBREAK!
