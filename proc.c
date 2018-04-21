@@ -654,14 +654,18 @@ sched(void) {
 void
 yield(void) {
 
-    acquire(&ptable.lock);  //DOC: yieldlock
-   // pushcli();
-
-    if(cas(&(myproc),RUNNING,RUNNABLE)){
-        sched();
-    }
+ acquire(&ptable.lock);  //DOC: yieldlock
+    myproc()->state = RUNNABLE;
+    sched();
     release(&ptable.lock);
-    //popcli();
+//     acquire(&ptable.lock);  //DOC: yieldlock
+//    // pushcli();
+
+//     if(cas(&(myproc),RUNNING,RUNNABLE)){
+//         sched();
+//     }
+//     release(&ptable.lock);
+//     //popcli();
 }
 
 // A fork child's very first scheduling by scheduler()
