@@ -279,7 +279,7 @@ exit(void) {
             if (cas(&(p->parent),(int)curproc,(int)initproc)){
                 //p->parent = initproc;
                 //TODO: check if also -ZOMBIE needed
-                if (p->state == ZOMBIE)// || p->state == -ZOMBIE)
+                if (p->state == ZOMBIE || p->state == -ZOMBIE)
                     wakeup1(initproc);
             }
         }
@@ -406,7 +406,7 @@ sched(void) {
         panic("sched locks");
 
     }
-    if (p->state == RUNNING)// || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
+    if (p->state == RUNNING || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
         panic("sched running");
     if (readeflags() & FL_IF)
         panic("sched interruptible");
@@ -453,7 +453,7 @@ forkret(void) {
 // Atomically release lock and sleep on chan.
 // Reacquires lock when awakened.
 void
-sleep(void *chan, struct spinlock* lk) {
+sleep(void *chan, struct spinlock* lock) {
     struct proc *p = myproc();
 
     if (p == 0)
@@ -465,24 +465,19 @@ sleep(void *chan, struct spinlock* lk) {
     // guaranteed that we won't miss any wakeup
     // (wakeup runs with ptable.lock locked),
     // so it's okay to release lk.
+    
     pushcli();
    
    if(cas(&(p->state),RUNNING,-SLEEPING)){
         // Go to sleep.
         p->chan = chan;
         cas(&(p->state),-SLEEPING,SLEEPING);
-   }
-    if(lk !=0)
-        release(lk);
-    sched();
-    // Tidy up.
-    p->chan = 0;
-    if(lk !=0)
-        acquire(lk);
+        sched();
+        // Tidy up.
+        p->chan = 0;
         popcli();
-        
+    }
 }
-
 
 //PAGEBREAK!
 // Wake up all processes sleeping on chan.
@@ -561,14 +556,14 @@ procdump(void) {
     uint pc[10];
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-        if (p->state == UNUSED )//|| p->state == -UNUSED)  //TODO: ADDED -UNUSED
+        if (p->state == UNUSED || p->state == -UNUSED)  //TODO: ADDED -UNUSED
             continue;
         if (p->state >= 0 && p->state < NELEM(states) && states[p->state])
             state = states[p->state];
         else
             state = "???";
         cprintf("%d %s %s", p->pid, state, p->name);
-        if (p->state == SLEEPING ){// || p->state == -SLEEPING) {
+        if (p->state == SLEEPING  || p->state == -SLEEPING) {
             getcallerpcs((uint *) p->context->ebp + 2, pc);
             for (i = 0; i < 10 && pc[i] != 0; i++)
                 cprintf(" %p", pc[i]);
