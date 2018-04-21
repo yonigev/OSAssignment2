@@ -275,11 +275,11 @@ exit(void) {
         //TODO:USE CAS HERE
         // Pass abandoned children to init.
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            if (p->parent == curproc) {
-            //if (cas(&(p->parent),(int)curproc,(int)initproc)){
-                p->parent = initproc;
+            //if (p->parent == curproc) {
+            if (cas(&(p->parent),(int)curproc,(int)initproc)){
+                //p->parent = initproc;
                 //TODO: check if also -ZOMBIE needed
-                if (p->state == ZOMBIE || p->state == -ZOMBIE)
+                if (p->state == ZOMBIE)// || p->state == -ZOMBIE)
                     wakeup1(initproc);
             }
         }
@@ -406,7 +406,7 @@ sched(void) {
         panic("sched locks");
 
     }
-    if (p->state == RUNNING || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
+    if (p->state == RUNNING)// || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
         panic("sched running");
     if (readeflags() & FL_IF)
         panic("sched interruptible");
@@ -479,9 +479,9 @@ sleep(void *chan, struct spinlock* lk) {
     p->chan = 0;
     if(lk !=0)
         acquire(lk);
-    popcli();
+        popcli();
         
-    }
+}
 
 
 //PAGEBREAK!
@@ -561,14 +561,14 @@ procdump(void) {
     uint pc[10];
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-        if (p->state == UNUSED || p->state == -UNUSED)  //TODO: ADDED -UNUSED
+        if (p->state == UNUSED )//|| p->state == -UNUSED)  //TODO: ADDED -UNUSED
             continue;
         if (p->state >= 0 && p->state < NELEM(states) && states[p->state])
             state = states[p->state];
         else
             state = "???";
         cprintf("%d %s %s", p->pid, state, p->name);
-        if (p->state == SLEEPING  || p->state == -SLEEPING) {
+        if (p->state == SLEEPING ){// || p->state == -SLEEPING) {
             getcallerpcs((uint *) p->context->ebp + 2, pc);
             for (i = 0; i < 10 && pc[i] != 0; i++)
                 cprintf(" %p", pc[i]);
