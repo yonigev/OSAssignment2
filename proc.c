@@ -481,7 +481,7 @@ sleep(void *chan, struct spinlock* lk) {
     if(lk != 0){
         release(lk);
     }
-  {}
+    }
     sched();
     // Tidy up.
     p->chan = 0;
