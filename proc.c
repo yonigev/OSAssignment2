@@ -386,7 +386,6 @@ scheduler(void) {
                // cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
                 swtch(&(c->scheduler), p->context);
                 
-                cprintf("cpu: %d STOPS running : %d\n",c,p);
                 switchkvm();
                 // Process is done running for now.
                 // It should have changed its p->state before coming back.
@@ -419,8 +418,10 @@ sched(void) {
         panic("sched locks");
 
     }
-    if (p->state == RUNNING)// || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
+    if (p->state == RUNNING){// || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
+        cprintf("p is :%d,%d \n",p->pid,p);
         panic("sched running");
+    }
     if (readeflags() & FL_IF)
         panic("sched interruptible");
     intena = mycpu()->intena;
