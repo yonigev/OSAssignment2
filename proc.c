@@ -467,7 +467,7 @@ forkret(void) {
 void
 sleep(void *chan, struct spinlock* lk) { 
     struct proc *p = myproc();
-    if(p === initproc)
+    if(p == initproc)
         cprintf("cpu : %d is making initproc sleep!!\n",mycpu());
 
     if (p == 0)
