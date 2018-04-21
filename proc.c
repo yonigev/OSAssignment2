@@ -559,11 +559,12 @@ scheduler(void) {
             // before jumping back to us.
 
             if(cas(&(p->state),RUNNABLE,-RUNNING)){
-                cprintf("switching to : %d, state: %d\n",p->pid,p->state);
                 c->proc = p;
                 switchuvm(p);
+                cprintf("switching to : %d, state: %d\n",p->pid,p->state);
                 cas(&(p->state),-RUNNING,RUNNING);
             }
+            cprintf("REALLY! switching to : %d, state: %d\n",p->pid,p->state);
             swtch(&(c->scheduler), p->context);
             switchkvm();
             // Process is done running for now.
