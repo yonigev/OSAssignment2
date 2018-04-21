@@ -561,7 +561,7 @@ scheduler(void) {
             if(cas(&(p->state),RUNNABLE,-RUNNING)){
                 c->proc = p;
                 switchuvm(p);
-                cprintf("switching to : %d, state: %d\n",p->pid,p->state);
+                cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c->intena);
                 cas(&(p->state),-RUNNING,RUNNING);
             }
             cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c->intena);
