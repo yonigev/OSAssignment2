@@ -401,8 +401,11 @@ sched(void) {
 
     // if (!holding(&ptable.lock))
     //     panic("sched ptable.lock");
-    if (mycpu()->ncli != 1)
+    if (mycpu()->ncli != 1){
+        cprintf("panicking. mycpu()->ncli: %d\n",mycpu()->ncli);
         panic("sched locks");
+
+    }
     if (p->state == RUNNING || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
         panic("sched running");
     if (readeflags() & FL_IF)
