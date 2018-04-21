@@ -472,14 +472,14 @@ sleep(void *chan, struct spinlock* lk) {
         p->chan = chan;
         cas(&(p->state),-SLEEPING,SLEEPING);
    }
-        if(lk !=0)
-            release(lk);
-        sched();
-        // Tidy up.
-        p->chan = 0;
-        if(lk !=0)
-            acquire(lk);
-        popcli();
+    if(lk !=0)
+        release(lk);
+    sched();
+    // Tidy up.
+    p->chan = 0;
+    popcli();
+    if(lk !=0)
+        acquire(lk);
         
     }
 
