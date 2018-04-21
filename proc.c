@@ -438,7 +438,7 @@ yield(void) {
     if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
         if(myproc() == initproc)
             cprintf("cpu: %d is making initproc yield()\n",mycpu());
-        if(cas(&(myproc()->state),-RUNNABLE,RUNNING))
+        if(cas(&(myproc()->state),-RUNNABLE,RUNNABLE))
             sched();
     }
     //release(&ptable.lock);
