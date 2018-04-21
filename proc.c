@@ -146,6 +146,8 @@ userinit(void) {
     p->pending=0;
     safestrcpy(p->name, "initcode", sizeof(p->name));
     p->cwd = namei("/");
+    
+    memset(p->handlers, SIG_DFL, 32 * sizeof(void *));
 
     // this assignment to p->state lets other cores
     // run this process. the acquire forces the above
@@ -158,11 +160,8 @@ userinit(void) {
     
     //p->state = RUNNABLE;
     
-    //set Default handler
-    if(cas(&(p->state),EMBRYO,-RUNNABLE)){
-        memset(p->handlers, SIG_DFL, 32 * sizeof(void *));
-        cas(&(p->state),-RUNNABLE,RUNNABLE);
-    }
+    cas(&(p->state),EMBRYO,RUNNABLE);
+      
     //release(&ptable.lock);
     popcli();
 }
@@ -275,9 +274,9 @@ exit(void) {
         //TODO:USE CAS HERE
         // Pass abandoned children to init.
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            if (p->parent == curproc) {
-            //if (cas(&(p->parent),(int)curproc,(int)initproc)){
-                p->parent = initproc;
+            //if (p->parent == curproc) {
+            if (cas(&(p->parent),(int)curproc,(int)initproc)){
+                //p->parent = initproc;
                 //TODO: check if also -ZOMBIE needed
                 if (p->state == ZOMBIE || p->state == -ZOMBIE)
                     wakeup1(initproc);
