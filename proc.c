@@ -466,9 +466,10 @@ sleep(void *chan, struct spinlock* lk) {
     // (wakeup runs with ptable.lock locked),
     // so it's okay to release lk.
     pushcli();
-    if(lk !=0)
-        release(lk);
+   
    if(cas(&(p->state),RUNNING,-SLEEPING)){
+        if(lk !=0)
+            release(lk);
         // Go to sleep.
         p->chan = chan;
         cas(&(p->state),-SLEEPING,SLEEPING);
