@@ -298,21 +298,19 @@ exit(void) {
 // Return -1 if this process has no children.
 int
 wait(void) {
-    struct proc *p;
+        struct proc *p;
     int havekids, pid;
     struct proc *curproc = myproc();
 
-    //acquire(&ptable.lock);
-    pushcli();
+    acquire(&ptable.lock);
     for (;;) {
         // Scan through table looking for exited children.
         havekids = 0;
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             if (p->parent != curproc)
                 continue;
-            //TODO: MORIEL SEES A PROBLEM
             havekids = 1;
-            if (cas(&(p->state),ZOMBIE,-UNUSED)){
+            if (p->state == ZOMBIE) {
                 // Found one.
                 pid = p->pid;
                 kfree(p->kstack);
@@ -322,23 +320,62 @@ wait(void) {
                 p->parent = 0;
                 p->name[0] = 0;
                 p->killed = 0;
-                cas(&(p->state),-UNUSED,UNUSED);
-                //release(&ptable.lock);
-                popcli();
+                p->state = UNUSED;
+                release(&ptable.lock);
                 return pid;
             }
         }
 
         // No point waiting if we don't have any children.
         if (!havekids || curproc->killed) {
-            //release(&ptable.lock);
-            popcli();
+            release(&ptable.lock);
             return -1;
         }
-        //TODO:use CAS and lose ptable.lock parameter VV
+
         // Wait for children to exit.  (See wakeup1 call in proc_exit.)
-        sleep(curproc, (struct spinlock*)0);  //DOC: wait-sleep
+        sleep(curproc, &ptable.lock);  //DOC: wait-sleep
     }
+    // struct proc *p;
+    // int havekids, pid;
+    // struct proc *curproc = myproc();
+
+    // //acquire(&ptable.lock);
+    // pushcli();
+    // for (;;) {
+    //     // Scan through table looking for exited children.
+    //     havekids = 0;
+    //     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    //         if (p->parent != curproc)
+    //             continue;
+    //         //TODO: MORIEL SEES A PROBLEM
+    //         havekids = 1;
+    //         if (cas(&(p->state),ZOMBIE,-UNUSED)){
+    //             // Found one.
+    //             pid = p->pid;
+    //             kfree(p->kstack);
+    //             p->kstack = 0;
+    //             freevm(p->pgdir);
+    //             p->pid = 0;
+    //             p->parent = 0;
+    //             p->name[0] = 0;
+    //             p->killed = 0;
+    //             cas(&(p->state),-UNUSED,UNUSED);
+    //             //release(&ptable.lock);
+    //             popcli();
+    //             return pid;
+    //         }
+    //     }
+
+    //     // No point waiting if we don't have any children.
+    //     if (!havekids || curproc->killed) {
+    //         //release(&ptable.lock);
+    //         popcli();
+    //         return -1;
+    //     }
+    //     //TODO:use CAS and lose ptable.lock parameter VV
+    //     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+    //     sleep(curproc, (struct spinlock*)0);  //DOC: wait-sleep
+    // }
 }
 
 //PAGEBREAK: 42
