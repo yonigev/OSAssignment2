@@ -581,11 +581,11 @@ scheduler(void) {
         sti();
 
         // Loop over process table looking for process to run.
-        //acquire(&ptable.lock);
+        acquire(&ptable.lock);
         pushcli();
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            //if (p->state != RUNNABLE)
-            if(!cas(&(p->state),RUNNABLE,RUNNABLE))
+            if (p->state != RUNNABLE)
+            //if(!cas(&(p->state),RUNNABLE,RUNNABLE))
                 continue;
 
             // Switch to chosen process.  It is the process's job
@@ -603,7 +603,7 @@ scheduler(void) {
             // It should have changed its p->state before coming back.
             c->proc = 0;
         }
-        //release(&ptable.lock);
+        release(&ptable.lock);
         popcli();
 
     }
