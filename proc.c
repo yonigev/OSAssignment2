@@ -129,7 +129,7 @@ userinit(void) {
     extern char _binary_initcode_start[], _binary_initcode_size[];
 
     p = allocproc();
-
+    cprintf("assigning initproc\n");
     initproc = p;
     if ((p->pgdir = setupkvm()) == 0)
         panic("userinit: out of memory?");
