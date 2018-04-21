@@ -372,6 +372,8 @@ scheduler(void) {
             // before jumping back to us.
 
             //if(cas(&(p->state),RUNNABLE,-RUNNING)){
+                if(p == userinit)
+                    cprintf("cpu: %d running userinit\n",c);
                 c->proc = p;
                 switchuvm(p);
                 //cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
