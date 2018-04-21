@@ -1,13 +1,23 @@
 // Routines to let C code use special x86 instructions.
 static inline int
 cas(volatile void *addr, int expected, int newval){
-  int result = 0;
-  asm volatile("lock; cmpxchgl %3, (%2)\n\t"  //compare eax to (addr), if equal, put newval in (addr), and set ZF. else, clear ZF and load (addr) into eax 
-                "setz %0\n\t"
-                : "=m"(result)
-                : "a"(expected), "b"(addr), "r"(newval) //expected -> eax. 
+   int ret = 1;
+  asm volatile("lock; cmpxchgl %3, (%2)\n\t" // eax == [ebx] ? [ebx] = newval : eax = [ebx]
+                "jz cas_success\n\t"
+                "movl $0, %0\n\t"
+                "cas_success:\n\t"
+                : "=m"(ret)
+                : "a"(expected), "b"(addr), "r"(newval)
                 : "memory");
-  return result;
+  return ret;
+  
+  // int result = 0;
+  // asm volatile("lock; cmpxchgl %3, (%2)\n\t"  //compare eax to (addr), if equal, put newval in (addr), and set ZF. else, clear ZF and load (addr) into eax 
+  //               "setz %0\n\t"
+  //               : "=m"(result)
+  //               : "a"(expected), "b"(addr), "r"(newval) //expected -> eax. 
+  //               : "memory");
+  // return result;
 }
 static inline uchar
 inb(ushort port)
