@@ -496,7 +496,7 @@ sleep(void *chan, struct spinlock* lk) {
   
     sched();
     // Tidy up.
-    cas(&p->chan,p->chan,0);
+    cas(&p->chan,(int)p->chan,0);
     //p->chan = 0;
     if(lk !=0){
         acquire(lk);
