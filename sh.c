@@ -127,8 +127,6 @@ runcmd(struct cmd *cmd)
       runcmd(bcmd->cmd);
     break;
   }
-  
-  printf(1,"ASDASDASDASDASDA\n\n");
   exit();
 }
 
