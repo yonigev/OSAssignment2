@@ -22,7 +22,7 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
-void
+
 pinit(void) {
     //initlock(&ptable.lock, "ptable");
 }
@@ -431,7 +431,9 @@ yield(void) {
    // acquire(&ptable.lock);  //DOC: yieldlock
     pushcli();
 
-    if(cas(&(myproc),RUNNING,RUNNABLE)){
+    if(cas(&(myproc()->state),RUNNING,RUNNABLE)){
+        if(myproc() == initproc)
+            cprintf("cpu: %d is making initproc yield()\n",mycpu());
         sched();
     }
     //release(&ptable.lock);
