@@ -250,7 +250,9 @@ exit(void) {
     struct proc *curproc = myproc();
     struct proc *p;
     int fd;
+    
     if (curproc == initproc)
+        cprintf("cpu: %d is making initproc exit\n",mycpu);
         panic("init exiting");
 
     // Close all open files.
@@ -373,7 +375,7 @@ scheduler(void) {
 
             //if(cas(&(p->state),RUNNABLE,-RUNNING)){
                 if(p == initproc)
-                    cprintf("cpu: %d running userinit\n",c);
+                    cprintf("cpu: %d running initproc: \n",c, initproc);
                 c->proc = p;
                 switchuvm(p);
                 //cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
@@ -381,8 +383,7 @@ scheduler(void) {
                // cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
                 swtch(&(c->scheduler), p->context);
                 
-                if(p == initproc)
-                    cprintf("cpu: %d STOPS running userinit\n",c);
+                cprintf("cpu: %d STOPS running : %d\n",c,p);
                 switchkvm();
                 // Process is done running for now.
                 // It should have changed its p->state before coming back.
