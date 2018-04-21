@@ -8,7 +8,7 @@
 #include "spinlock.h"
 
 struct {
-    //struct spinlock lock;
+    struct spinlock lock;
     struct proc proc[NPROC];
 } ptable;
 
@@ -24,7 +24,7 @@ static void wakeup1(void *chan);
 
 void
 pinit(void) {
-    //initlock(&ptable.lock, "ptable");
+    initlock(&ptable.lock, "ptable");
 }
 
 // Must be called with interrupts disabled
@@ -453,11 +453,17 @@ forkret(void) {
 // Atomically release lock and sleep on chan.
 // Reacquires lock when awakened.
 void
-sleep(void *chan, struct spinlock* lock) {
-    struct proc *p = myproc();
+sleep(void *chan, struct spinlock* lk) {
+   
+   
+   
+   struct proc *p = myproc();
 
     if (p == 0)
         panic("sleep");
+
+    if (lk == 0)
+        panic("sleep without lk");
 
     // Must acquire ptable.lock in order to
     // change p->state and then call sched.
@@ -465,23 +471,55 @@ sleep(void *chan, struct spinlock* lock) {
     // guaranteed that we won't miss any wakeup
     // (wakeup runs with ptable.lock locked),
     // so it's okay to release lk.
-    
-    pushcli();
-    if(lock != 0){
-        release(lock);
+    if (lk != &ptable.lock) {  //DOC: sleeplock0
+        acquire(&ptable.lock);  //DOC: sleeplock1
+        release(lk);
     }
-   if(cas(&(p->state),RUNNING,-SLEEPING)){
-        // Go to sleep.
-        p->chan = chan;
-        cas(&(p->state),-SLEEPING,SLEEPING);
-    }
+    // Go to sleep.
+    p->chan = chan;
+    p->state = SLEEPING;
+
     sched();
+
     // Tidy up.
     p->chan = 0;
-    if(lock !=0){
-        acquire(lock);
+
+    // Reacquire original lock.
+    if (lk != &ptable.lock) {  //DOC: sleeplock2
+        release(&ptable.lock);
+        acquire(lk);
     }
-    popcli();
+   
+   
+   
+//     struct proc *p = myproc();
+
+//     if (p == 0)
+//         panic("sleep");
+
+//     // Must acquire ptable.lock in order to
+//     // change p->state and then call sched.
+//     // Once we hold ptable.lock, we can be
+//     // guaranteed that we won't miss any wakeup
+//     // (wakeup runs with ptable.lock locked),
+//     // so it's okay to release lk.
+    
+//     pushcli();
+//     if(lock != 0){
+//         release(lock);
+//     }
+//    if(cas(&(p->state),RUNNING,-SLEEPING)){
+//         // Go to sleep.
+//         p->chan = chan;
+//         cas(&(p->state),-SLEEPING,SLEEPING);
+//     }
+//     sched();
+//     // Tidy up.
+//     p->chan = 0;
+//     if(lock !=0){
+//         acquire(lock);
+//     }
+//     popcli();
 
 }
 
