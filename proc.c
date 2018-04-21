@@ -508,9 +508,22 @@ wakeup1(void *chan) {
     struct proc *p;
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->chan == chan){
-            cas(&(p->state),SLEEPING,RUNNABLE);
-        }
+        // if(p->chan == chan){
+        //     cas(&(p->state),SLEEPING,RUNNABLE);
+        // }
+
+            if (p->chan == (int) chan && (p->state == SLEEPING || p->state == -SLEEPING)) {
+      while (p->state ==-SLEEPING) {
+        // busy-wait
+      }
+      if (cas(&p->state, SLEEPING, -RUNNABLE)) {
+        p->chan = 0;
+        if (!cas(&p->state,-RUNNABLE, RUNNABLE))
+          panic("wakeup1: cas failed");
+      }
+    }
+
+
     }
    
 }
