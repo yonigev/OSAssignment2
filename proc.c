@@ -129,7 +129,6 @@ userinit(void) {
     extern char _binary_initcode_start[], _binary_initcode_size[];
 
     p = allocproc();
-    cprintf("assigning initproc\n");
     initproc = p;
     if ((p->pgdir = setupkvm()) == 0)
         panic("userinit: out of memory?");
@@ -276,9 +275,9 @@ exit(void) {
         //TODO:USE CAS HERE
         // Pass abandoned children to init.
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            //if (p->parent == curproc) {
-            if (cas(&(p->parent),(int)curproc,(int)initproc)){
-                //p->parent = initproc;
+            if (p->parent == curproc) {
+            //if (cas(&(p->parent),(int)curproc,(int)initproc)){
+                p->parent = initproc;
                 //TODO: check if also -ZOMBIE needed
                 if (p->state == ZOMBIE || p->state == -ZOMBIE)
                     wakeup1(initproc);
