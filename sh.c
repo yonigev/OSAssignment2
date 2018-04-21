@@ -64,7 +64,7 @@ runcmd(struct cmd *cmd)
   struct pipecmd *pcmd;
   struct redircmd *rcmd;
 
-  if(cmd == 0){
+  if(cmd == 0)
     exit();
 
   switch(cmd->type){
@@ -127,7 +127,8 @@ runcmd(struct cmd *cmd)
       runcmd(bcmd->cmd);
     break;
   }
-  printf(1,"ASLDALSDL:ASLDMS\n");
+  
+  printf(1,"ASDASDASDASDASDA\n\n");
   exit();
 }
 
