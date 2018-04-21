@@ -253,7 +253,7 @@ exit(void) {
     int fd;
     
     if (curproc == initproc){
-        cprintf("cpu: %d is making initproc exit\n",mycpu());
+        //cprintf("cpu: %d is making initproc exit\n",mycpu());
         panic("init exiting");
     }
 
@@ -472,8 +472,8 @@ forkret(void) {
 void
 sleep(void *chan, struct spinlock* lk) { 
     struct proc *p = myproc();
-    if(p == initproc)
-        cprintf("cpu : %d is making initproc sleep!!\n",mycpu());
+    // if(p == initproc)
+    //     cprintf("cpu : %d is making initproc sleep!!\n",mycpu());
 
     if (p == 0)
         panic("sleep");
