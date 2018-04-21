@@ -279,7 +279,7 @@ exit(void) {
             if (cas(&(p->parent),curproc,initproc)){
                 //p->parent = initproc;
                 //TODO: check if also -ZOMBIE needed
-                if (p->state == ZOMBIE)
+                if (p->state == ZOMBIE || p->state == -ZOMBIE)
                     wakeup1(initproc);
             }
         }
@@ -312,7 +312,6 @@ wait(void) {
                 continue;
             //TODO: MORIEL SEES A PROBLEM
             havekids = 1;
-            //if (p->state == ZOMBIE) {
             if (cas(&(p->state),ZOMBIE,-UNUSED)){
                 // Found one.
                 pid = p->pid;
@@ -367,18 +366,17 @@ scheduler(void) {
             if (p->state != RUNNABLE)
                 continue;
 
-
             // Switch to chosen process.  It is the process's job
             // to release ptable.lock and then reacquire it
             // before jumping back to us.
 
-            c->proc = p;
-            switchuvm(p);
-            p->state = RUNNING;
-
+            if(cas(&(p->state),RUNNABLE,-RUNNING)){
+                c->proc = p;
+                switchuvm(p);
+                cas(&(p->state),-RUNNING,RUNNING);
+            }
             swtch(&(c->scheduler), p->context);
             switchkvm();
-
             // Process is done running for now.
             // It should have changed its p->state before coming back.
             c->proc = 0;
@@ -405,7 +403,7 @@ sched(void) {
     //     panic("sched ptable.lock");
     if (mycpu()->ncli != 1)
         panic("sched locks");
-    if (p->state == RUNNING)
+    if (p->state == RUNNING || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
         panic("sched running");
     if (readeflags() & FL_IF)
         panic("sched interruptible");
@@ -420,8 +418,10 @@ yield(void) {
 
     //acquire(&ptable.lock);  //DOC: yieldlock
     pushcli();
-    myproc()->state = RUNNABLE;
-    sched();
+
+    if(cas(&(myproc),RUNNING,RUNNABLE)){
+        sched();
+    }
     //release(&ptable.lock);
     popcli();
 }
@@ -488,9 +488,6 @@ wakeup1(void *chan) {
             cas(&(p->state),SLEEPING,RUNNABLE);
         }
     }
-
-        // if (p->state == SLEEPING && p->chan == chan)
-        //     p->state = RUNNABLE;
 }
 
 // Wake up all processes sleeping on chan.
@@ -556,14 +553,14 @@ procdump(void) {
     uint pc[10];
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-        if (p->state == UNUSED)
+        if (p->state == UNUSED || p->state == -UNUSED)  //TODO: ADDED -UNUSED
             continue;
         if (p->state >= 0 && p->state < NELEM(states) && states[p->state])
             state = states[p->state];
         else
             state = "???";
         cprintf("%d %s %s", p->pid, state, p->name);
-        if (p->state == SLEEPING) {
+        if (p->state == SLEEPING  || p->state == -SLEEPING) {
             getcallerpcs((uint *) p->context->ebp + 2, pc);
             for (i = 0; i < 10 && pc[i] != 0; i++)
                 cprintf(" %p", pc[i]);
