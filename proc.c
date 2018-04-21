@@ -226,7 +226,7 @@ growproc(int n) {
 // Caller must set state of returned proc to RUNNABLE.
 int
 fork(void) {
-    int i, pid;
+     int i, pid;
     struct proc *np;
     struct proc *curproc = myproc();
 
@@ -239,8 +239,7 @@ fork(void) {
     if ((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0) {
         kfree(np->kstack);
         np->kstack = 0;
-        cas(&(np->state),EMBRYO,UNUSED);
-        //np->state = UNUSED;
+        np->state = UNUSED;
         return -1;
     }
     np->sz = curproc->sz;
@@ -259,21 +258,66 @@ fork(void) {
 
     pid = np->pid;
 
-    //acquire(&ptable.lock);
-    pushcli();
+    acquire(&ptable.lock);
     //task 2.1.2.2 - inheriting parent's stuff
-    
-    //if process is not 0, and an EMBRYO, change to "transitioning to RUNNABLE"
-    if (curproc && cas(&(np->state),EMBRYO,-RUNNABLE)) {
+    if (curproc != 0) {
         for (i = 0; i < 32; i++) { np->handlers[i] = curproc->handlers[i]; }
         np->mask = curproc->mask;
         np->pending=0;
-        cas(&(np->state),-RUNNABLE,RUNNABLE);
     }
+    np->state = RUNNABLE;
 
-    //release(&ptable.lock);
-    popcli();
+    release(&ptable.lock);
+
     return pid;
+    // int i, pid;
+    // struct proc *np;
+    // struct proc *curproc = myproc();
+
+    // // Allocate process.
+    // if ((np = allocproc()) == 0) {
+    //     return -1;
+    // }
+
+    // // Copy process state from proc.
+    // if ((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0) {
+    //     kfree(np->kstack);
+    //     np->kstack = 0;
+    //     cas(&(np->state),EMBRYO,UNUSED);
+    //     //np->state = UNUSED;
+    //     return -1;
+    // }
+    // np->sz = curproc->sz;
+    // np->parent = curproc;
+    // *np->tf = *curproc->tf;
+
+    // // Clear %eax so that fork returns 0 in the child.
+    // np->tf->eax = 0;
+
+    // for (i = 0; i < NOFILE; i++)
+    //     if (curproc->ofile[i])
+    //         np->ofile[i] = filedup(curproc->ofile[i]);
+    // np->cwd = idup(curproc->cwd);
+
+    // safestrcpy(np->name, curproc->name, sizeof(curproc->name));
+
+    // pid = np->pid;
+
+    // //acquire(&ptable.lock);
+    // pushcli();
+    // //task 2.1.2.2 - inheriting parent's stuff
+    
+    // //if process is not 0, and an EMBRYO, change to "transitioning to RUNNABLE"
+    // if (curproc && cas(&(np->state),EMBRYO,-RUNNABLE)) {
+    //     for (i = 0; i < 32; i++) { np->handlers[i] = curproc->handlers[i]; }
+    //     np->mask = curproc->mask;
+    //     np->pending=0;
+    //     cas(&(np->state),-RUNNABLE,RUNNABLE);
+    // }
+
+    // //release(&ptable.lock);
+    // popcli();
+    // return pid;
 }
 
 // Exit the current process.  Does not return.
@@ -682,23 +726,42 @@ atomic_set_signal(struct proc* p,int signum){
 // to user space (see trap in trap.c).
 int
 kill(int pid, int signum) {
-    struct proc *p;
+      struct proc *p;
     //Legal signal number
     if (signum >= 0 && signum <= 31) {
-        //acquire(&ptable.lock);
-        pushcli();
+        acquire(&ptable.lock);
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             if (p->pid == pid) {
-               atomic_set_signal(p,signum);               
-                //release(&ptable.lock);
-                popcli();
+
+                p->pending = p->pending | (1 << signum);
+                //p->killed = 1;
+                // Wake process from sleep if necessary.
+                //if(p->state == SLEEPING)
+                //  p->state = RUNNABLE;
+                release(&ptable.lock);
                 return 0;
             }
         }
-        //release(&ptable.lock);
-        popcli();
+        release(&ptable.lock);
     }
     return -1;
+    // struct proc *p;
+    // //Legal signal number
+    // if (signum >= 0 && signum <= 31) {
+    //     //acquire(&ptable.lock);
+    //     pushcli();
+    //     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    //         if (p->pid == pid) {
+    //            atomic_set_signal(p,signum);               
+    //             //release(&ptable.lock);
+    //             popcli();
+    //             return 0;
+    //         }
+    //     }
+    //     //release(&ptable.lock);
+    //     popcli();
+    // }
+    // return -1;
 }
 
 //PAGEBREAK: 36
