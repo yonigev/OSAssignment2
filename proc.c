@@ -674,8 +674,8 @@ void
 forkret(void) {
     static int first = 1;
     // Still holding ptable.lock from scheduler.
-   // release(&ptable.lock);
-    popcli();
+    release(&ptable.lock);
+   // popcli();
 
     if (first) {
         // Some initialization functions must be run in the context
@@ -860,14 +860,14 @@ procdump(void) {
     uint pc[10];
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-        if (p->state == UNUSED || p->state == -UNUSED)  //TODO: ADDED -UNUSED
+        if (p->state == UNUSED)// || p->state == -UNUSED)  //TODO: ADDED -UNUSED
             continue;
         if (p->state >= 0 && p->state < NELEM(states) && states[p->state])
             state = states[p->state];
         else
             state = "???";
         cprintf("%d %s %s", p->pid, state, p->name);
-        if (p->state == SLEEPING  || p->state == -SLEEPING) {
+        if (p->state == SLEEPING ){// || p->state == -SLEEPING) {
             getcallerpcs((uint *) p->context->ebp + 2, pc);
             for (i = 0; i < 10 && pc[i] != 0; i++)
                 cprintf(" %p", pc[i]);
