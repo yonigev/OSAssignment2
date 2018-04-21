@@ -542,11 +542,11 @@ wakeup1(void *chan) {
 // Wake up all processes sleeping on chan.
 void
 wakeup(void *chan) {
-    //acquire(&ptable.lock);
-    pushcli();
+    acquire(&ptable.lock);
+   // pushcli();
     wakeup1(chan);
-    //release(&ptable.lock);
-    popcli();
+    release(&ptable.lock);
+    //popcli();
 }
 
 
