@@ -380,6 +380,9 @@ scheduler(void) {
                 cas(&(p->state),-RUNNING,RUNNING);
                // cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
                 swtch(&(c->scheduler), p->context);
+                
+                if(p == initproc)
+                    cprintf("cpu: %d STOPS running userinit\n",c);
                 switchkvm();
                 // Process is done running for now.
                 // It should have changed its p->state before coming back.
