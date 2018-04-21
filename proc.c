@@ -24,7 +24,7 @@ static void wakeup1(void *chan);
 
 void
 pinit(void) {
-    initlock(&ptable.lock, "ptable");
+    //initlock(&ptable.lock, "ptable");
 }
 
 // Must be called with interrupts disabled
@@ -376,10 +376,10 @@ scheduler(void) {
             if(cas(&(p->state),RUNNABLE,-RUNNING)){
                 c->proc = p;
                 switchuvm(p);
-                //cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c->intena);
+                cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
                 cas(&(p->state),-RUNNING,RUNNING);
             }
-            cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,p->);
+            cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
             swtch(&(c->scheduler), p->context);
             switchkvm();
             // Process is done running for now.
