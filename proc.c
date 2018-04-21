@@ -281,7 +281,7 @@ exit(void) {
             if (cas(&(p->parent),(int)curproc,(int)initproc)){
                 //p->parent = initproc;
                 //TODO: check if also -ZOMBIE needed
-                if (p->state == ZOMBIE || p->state == -ZOMBIE)
+                if (p->state == ZOMBIE )//|| p->state == -ZOMBIE)
                     wakeup1(initproc);
             }
         }
@@ -417,7 +417,7 @@ sched(void) {
         panic("sched locks");
 
     }
-    if (p->state == RUNNING || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
+    if (p->state == RUNNING)// || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
         panic("sched running");
     if (readeflags() & FL_IF)
         panic("sched interruptible");
@@ -432,10 +432,11 @@ yield(void) {
    // acquire(&ptable.lock);  //DOC: yieldlock
     pushcli();
 
-    if(cas(&(myproc()->state),RUNNING,RUNNABLE)){
+    if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
         if(myproc() == initproc)
             cprintf("cpu: %d is making initproc yield()\n",mycpu());
-        sched();
+        if(cas(&(myproc()->state),-RUNNABLE,RUNNING))
+            sched();
     }
     //release(&ptable.lock);
     popcli();
