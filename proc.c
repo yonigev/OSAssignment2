@@ -464,7 +464,6 @@ sleep(void *chan, struct spinlock* lk) {
 
     if (p == 0)
         panic("sleep");
-
     // Must acquire ptable.lock in order to
     // change p->state and then call sched.
     // Once we hold ptable.lock, we can be
@@ -477,11 +476,11 @@ sleep(void *chan, struct spinlock* lk) {
         // Go to sleep.
         p->chan = chan;
         cas(&(p->state),-SLEEPING,SLEEPING);
-    
+    }
     if(lk != 0){
         release(lk);
     }
-    }
+  
     sched();
     // Tidy up.
     p->chan = 0;
