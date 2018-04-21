@@ -465,8 +465,8 @@ sleep(void *chan, struct spinlock* lock) {
     // guaranteed that we won't miss any wakeup
     // (wakeup runs with ptable.lock locked),
     // so it's okay to release lk.
-   
-    pushcli();
+    if(lock == 0)
+        pushcli();
    
    if(cas(&(p->state),RUNNING,-SLEEPING)){
         // Go to sleep.
@@ -475,7 +475,8 @@ sleep(void *chan, struct spinlock* lock) {
         sched();
         // Tidy up.
         p->chan = 0;
-        popcli();
+        if(lock == 0)
+            popcli();
     }
 }
 
