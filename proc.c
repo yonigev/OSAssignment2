@@ -477,11 +477,11 @@ sleep(void *chan, struct spinlock* lk) {
         // Go to sleep.
         p->chan = chan;
         cas(&(p->state),-SLEEPING,SLEEPING);
-    }
+    
     if(lk != 0){
         release(lk);
     }
-  
+  {}
     sched();
     // Tidy up.
     p->chan = 0;
