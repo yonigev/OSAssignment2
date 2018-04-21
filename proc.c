@@ -366,14 +366,15 @@ scheduler(void) {
         pushcli();
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             //if (p->state != RUNNABLE)
-            if(!cas(&(p->state),RUNNABLE,RUNNABLE))
+            if(!cas(&(p->state),RUNNABLE,-RUNNING))
                 continue;
 
             // Switch to chosen process.  It is the process's job
             // to release ptable.lock and then reacquire it
             // before jumping back to us.
 
-            if(cas(&(p->state),RUNNABLE,-RUNNING)){
+            //if(cas(&(p->state),RUNNABLE,-RUNNING)){
+             else{
                 c->proc = p;
                 switchuvm(p);
                 cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
