@@ -453,10 +453,7 @@ forkret(void) {
 // Atomically release lock and sleep on chan.
 // Reacquires lock when awakened.
 void
-sleep(void *chan, struct spinlock* lk) {
-   
-   
-   
+sleep(void *chan, struct spinlock* lk) { 
    struct proc *p = myproc();
 
     if (p == 0)
@@ -505,8 +502,8 @@ sleep(void *chan, struct spinlock* lk) {
 //     // so it's okay to release lk.
     
 //     pushcli();
-//     if(lock != 0){
-//         release(lock);
+//     if(lk != 0){
+//         release(lk);
 //     }
 //    if(cas(&(p->state),RUNNING,-SLEEPING)){
 //         // Go to sleep.
@@ -516,8 +513,8 @@ sleep(void *chan, struct spinlock* lk) {
 //     sched();
 //     // Tidy up.
 //     p->chan = 0;
-//     if(lock !=0){
-//         acquire(lock);
+//     if(lk !=0){
+//         acquire(lk);
 //     }
 //     popcli();
 
@@ -528,13 +525,18 @@ sleep(void *chan, struct spinlock* lk) {
 // The ptable lock must be held.
 static void
 wakeup1(void *chan) {
-    struct proc *p;
+    // struct proc *p;
 
-    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->chan == chan){
-            cas(&(p->state),SLEEPING,RUNNABLE);
-        }
-    }
+    // for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    //     if(p->chan == chan){
+    //         cas(&(p->state),SLEEPING,RUNNABLE);
+    //     }
+    // }
+     struct proc *p;
+
+    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        if (p->state == SLEEPING && p->chan == chan)
+            p->state = RUNNABLE;
 }
 
 // Wake up all processes sleeping on chan.
