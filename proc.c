@@ -305,9 +305,9 @@ wait(void) {
     struct proc *p;
     int havekids, pid;
     struct proc *curproc = myproc();
-    if(initproc == curproc){
-        cprintf("initproc entered wait with cpu: %d\n",mycpu());
-    }
+    // if(initproc == curproc){
+    //     cprintf("initproc entered wait with cpu: %d\n",mycpu());
+    // }
     //acquire(&ptable.lock);
     pushcli();
     for (;;) {
@@ -378,8 +378,8 @@ scheduler(void) {
             // before jumping back to us.
 
             //if(cas(&(p->state),RUNNABLE,-RUNNING)){
-                if(p == initproc)
-                    cprintf("cpu: %d running initproc: \n",c, initproc);
+                // if(p == initproc)
+                //     cprintf("cpu: %d running initproc: \n",c, initproc);
                 c->proc = p;
                 switchuvm(p);
                 //cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
