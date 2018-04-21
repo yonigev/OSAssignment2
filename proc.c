@@ -365,8 +365,8 @@ scheduler(void) {
         //acquire(&ptable.lock);
         pushcli();
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            if (p->state != RUNNABLE)
-            //if(!cas(&(p->state),RUNNABLE,RUNNABLE))
+            //if (p->state != RUNNABLE)
+            if(!cas(&(p->state),RUNNABLE,RUNNABLE))
                 continue;
 
             // Switch to chosen process.  It is the process's job
@@ -378,13 +378,14 @@ scheduler(void) {
                 switchuvm(p);
                 cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
                 cas(&(p->state),-RUNNING,RUNNING);
+                cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
+                swtch(&(c->scheduler), p->context);
+                switchkvm();
+                // Process is done running for now.
+                // It should have changed its p->state before coming back.
+                c->proc = 0;
             }
-            cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
-            swtch(&(c->scheduler), p->context);
-            switchkvm();
-            // Process is done running for now.
-            // It should have changed its p->state before coming back.
-            c->proc = 0;
+           
         }
         //release(&ptable.lock);
         popcli();
