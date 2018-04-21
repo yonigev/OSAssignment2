@@ -468,19 +468,21 @@ sleep(void *chan, struct spinlock* lk) {
     pushcli();
    
    if(cas(&(p->state),RUNNING,-SLEEPING)){
-        if(lk !=0)
-            release(lk);
         // Go to sleep.
         p->chan = chan;
         cas(&(p->state),-SLEEPING,SLEEPING);
+   }
+        if(lk !=0)
+            release(lk);
         sched();
         // Tidy up.
         p->chan = 0;
-        popcli();
         if(lk !=0)
             acquire(lk);
+        popcli();
+        
     }
-}
+
 
 //PAGEBREAK!
 // Wake up all processes sleeping on chan.
