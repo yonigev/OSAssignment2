@@ -584,7 +584,8 @@ scheduler(void) {
         //acquire(&ptable.lock);
         pushcli();
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            if (p->state != RUNNABLE)
+            //if (p->state != RUNNABLE)
+            if(!cas(&(p->state),RUNNABLE,RUNNABLE))
                 continue;
 
             // Switch to chosen process.  It is the process's job
@@ -674,8 +675,8 @@ void
 forkret(void) {
     static int first = 1;
     // Still holding ptable.lock from scheduler.
-    release(&ptable.lock);
-   // popcli();
+    //release(&ptable.lock);
+    popcli();
 
     if (first) {
         // Some initialization functions must be run in the context
