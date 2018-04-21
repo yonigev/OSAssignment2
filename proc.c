@@ -559,6 +559,7 @@ scheduler(void) {
             // before jumping back to us.
 
             if(cas(&(p->state),RUNNABLE,-RUNNING)){
+                cprintf("switching to : %d, state: %d\n",p->pid,p->state);
                 c->proc = p;
                 switchuvm(p);
                 cas(&(p->state),-RUNNING,RUNNING);
