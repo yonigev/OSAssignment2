@@ -467,6 +467,9 @@ sleep(void *chan, struct spinlock* lock) {
     // so it's okay to release lk.
     
     pushcli();
+    if(lock != 0){
+        release(lock);
+    }
    if(cas(&(p->state),RUNNING,-SLEEPING)){
         // Go to sleep.
         p->chan = chan;
@@ -475,7 +478,9 @@ sleep(void *chan, struct spinlock* lock) {
     sched();
     // Tidy up.
     p->chan = 0;
-    
+    if(lock !=0){
+        acquire(lock);
+    }
     popcli();
 
 }
