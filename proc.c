@@ -415,7 +415,7 @@ sched(void) {
     // if (!holding(&ptable.lock))
     //     panic("sched ptable.lock");
     if (mycpu()->ncli != 1){
-        cprintf("panicking. mycpu()->ncli: %d\n",mycpu()->ncli);
+        //cprintf("panicking. mycpu()->ncli: %d\n",mycpu()->ncli);
         panic("sched locks");
 
     }
@@ -496,7 +496,8 @@ sleep(void *chan, struct spinlock* lk) {
   
     sched();
     // Tidy up.
-    p->chan = 0;
+    cas(&p->chan,p->chan,0);
+    //p->chan = 0;
     if(lk !=0){
         acquire(lk);
     }
