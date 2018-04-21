@@ -22,7 +22,7 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
-
+void
 pinit(void) {
     //initlock(&ptable.lock, "ptable");
 }
