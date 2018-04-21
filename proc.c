@@ -374,7 +374,6 @@ scheduler(void) {
             // before jumping back to us.
 
             //if(cas(&(p->state),RUNNABLE,-RUNNING)){
-             else{
                 c->proc = p;
                 switchuvm(p);
                 //cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
@@ -385,7 +384,7 @@ scheduler(void) {
                 // Process is done running for now.
                 // It should have changed its p->state before coming back.
                 c->proc = 0;
-            }
+            
            
         }
         //release(&ptable.lock);
