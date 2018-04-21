@@ -512,7 +512,7 @@ wakeup1(void *chan) {
         //     cas(&(p->state),SLEEPING,RUNNABLE);
         // }
 
-            if (p->chan == (int) chan && (p->state == SLEEPING || p->state == -SLEEPING)) {
+            if (p->chan ==  chan && (p->state == SLEEPING || p->state == -SLEEPING)) {
       while (p->state ==-SLEEPING) {
         // busy-wait
       }
