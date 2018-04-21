@@ -65,9 +65,7 @@ runcmd(struct cmd *cmd)
   struct redircmd *rcmd;
 
   if(cmd == 0){
-    printf(1,"ASLDALSDL:ASLDMS\n");
     exit();
-  }
 
   switch(cmd->type){
   default:
@@ -129,6 +127,7 @@ runcmd(struct cmd *cmd)
       runcmd(bcmd->cmd);
     break;
   }
+  printf(1,"ASLDALSDL:ASLDMS\n");
   exit();
 }
 
