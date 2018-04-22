@@ -401,7 +401,7 @@ scheduler(void) {
             if(p){
                 
                 if(cas((&p->state),-RUNNABLE,RUNNABLE)){
-                    cprintf("Changed p: %d from -RUNNABLE to RUNNABLE \n",p);
+                    cprintf("CPU: %d    Changed p: %d from -RUNNABLE to RUNNABLE \n",cpuid(),p);
                 }
                 if(cas((&p->state),-SLEEPING,SLEEPING)){
                     cprintf("Changed p: %d from -SLEEPING to SLEEPING \n",p);
@@ -459,7 +459,7 @@ yield(void) {
    // acquire(&ptable.lock);  //DOC: yieldlock
     pushcli();
     if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
-        cprintf("in yield,changed state of : %d to -RUNNABLE. calling sched() ncli: %d\n",myproc(),mycpu()->ncli);
+        cprintf("in yield,   CPU: %d     ,changed state of : %d to -RUNNABLE. calling sched() ncli: %d\n",cpuid(),myproc(),mycpu()->ncli);
         sched();       
 
 
