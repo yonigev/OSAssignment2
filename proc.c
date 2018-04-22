@@ -438,12 +438,12 @@ sched(void) {
     // if (!holding(&ptable.lock))
     //     panic("sched ptable.lock");
     if (mycpu()->ncli != 1){
-        cprintf("CPU --- %d,    panicking. mycpu()->ncli: %d\n",cpuid();,mycpu()->ncli);
+        cprintf("CPU --- %d,    panicking. mycpu()->ncli: %d\n",cpuid(),mycpu()->ncli);
         panic("sched locks");
 
     }
     if (p->state == RUNNING){// || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
-        cprintf("CPU --- %d,    p is :%d,%d \n",cpuid();,p->pid,p);
+        cprintf("CPU --- %d,    p is :%d,%d \n",cpuid(),p->pid,p);
         panic("sched running");
     }
     if (readeflags() & FL_IF)
