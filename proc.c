@@ -366,15 +366,16 @@ scheduler(void) {
     //struct proc *oldp=c->proc;
     //cprintf("cpu: %d entered scheduler, process:  %d\n",c,myproc());
 
-    if(myproc()){
-        cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-        cas((&myproc()->state),-SLEEPING,SLEEPING);
-        //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-    }
+    
 
     c->proc = 0;
 
     for (;;) {
+        if(myproc()){
+            cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+            cas((&myproc()->state),-SLEEPING,SLEEPING);
+            //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+        }
         // Enable interrupts on this processor.
         sti();
 
