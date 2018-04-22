@@ -397,8 +397,12 @@ scheduler(void) {
              c->proc = 0;
             if(p){
                 cprintf("what the fuck\n");
-                cas((&p->state),-RUNNABLE,RUNNABLE);
-                cas((&p->state),-SLEEPING,SLEEPING);
+                if(cas((&p->state),-RUNNABLE,RUNNABLE)){
+                    cprintf("Changed p: %d from -RUNNABLE to RUNNABLE \n",p);
+                }
+                if(cas((&p->state),-SLEEPING,SLEEPING)){
+                    cprintf("Changed p: %d from -SLEEPING to SLEEPING \n",p);
+                }
                 if(cas((&p->state),-ZOMBIE,ZOMBIE)){
                     cprintf("waking up all who are sleeping on : %d 's parent - %d\n",p,p->parent);
                     wakeup1(p->parent);
