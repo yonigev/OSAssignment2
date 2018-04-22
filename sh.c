@@ -154,7 +154,6 @@ main(void)
       break;
     }
   }
-  printf(1,"<<<<SH>>>>2 procnum: %d",getpid());
 
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
@@ -169,7 +168,6 @@ main(void)
       runcmd(parsecmd(buf));
     wait();
   }
-    printf(1,"<<<<SH>>>>3 procnum: %d",getpid());
 
   exit();
 }
