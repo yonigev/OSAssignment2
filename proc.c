@@ -403,13 +403,13 @@ scheduler(void) {
             if(p){
                 
                 if(cas((&p->state),-RUNNABLE,RUNNABLE)){
-                    cprintf("CPU --- %d, SCHEDULER   <-RUNNABLE,RUNNABLE>    Changed p: %d from -RUNNABLE to RUNNABLE, depth:%d \n",cpuid(),p,mycpu()->ncli);
+                    cprintf("\n\nCPU --- %d, SCHEDULER   <-RUNNABLE,RUNNABLE>    Changed p: %d from -RUNNABLE to RUNNABLE, depth:%d \n",cpuid(),p,mycpu()->ncli);
                 }
                 if(cas((&p->state),-SLEEPING,SLEEPING)){
-                    cprintf("CPU ---%d,  SCHEDULER   <-SLEEPING,SLEEPING>   p: %d from -SLEEPING to SLEEPING \n",cpuid(),p);
+                    cprintf("\n\nCPU ---%d,  SCHEDULER   <-SLEEPING,SLEEPING>   p: %d from -SLEEPING to SLEEPING \n",cpuid(),p);
                 }
                 if(cas((&p->state),-ZOMBIE,ZOMBIE)){
-                    cprintf("CPU --- %d,  SCHEDULER <-ZOMBIE,ZOMBIE> waking up all who are sleeping on : %d 's parent - %d\n",cpuid(),p,p->parent);
+                    cprintf("\n\nCPU --- %d,  SCHEDULER <-ZOMBIE,ZOMBIE> waking up all who are sleeping on : %d 's parent - %d\n",cpuid(),p,p->parent);
                     wakeup1(p->parent);
                 }
                     //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
