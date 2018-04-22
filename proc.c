@@ -526,8 +526,9 @@ sleep(void *chan, struct spinlock* lk) {
         cprintf("in sleep, releasing: %d\n",lk);
         release(lk);
     }
-    else
-        popcli();
+    // else
+    //     popcli();
+
     cprintf("in sleep calling sched() ncli: %d\n",mycpu()->ncli);
     sched();
     // Tidy up.
@@ -537,8 +538,9 @@ sleep(void *chan, struct spinlock* lk) {
         //cprintf("in sleep, acquiring: %d\n",lk);
         acquire(lk);
     }
-    else
-        pushcli();
+    // else
+    //     pushcli();
+    
     popcli();
 
 }
