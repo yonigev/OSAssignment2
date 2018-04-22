@@ -457,6 +457,7 @@ sched(void) {
 void
 yield(void) {
    // acquire(&ptable.lock);  //DOC: yieldlock
+    cprintf("in yield,   CPU: %d   doing pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     pushcli();
     if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
         cprintf("in yield,   CPU: %d     ,changed state of : %d to -RUNNABLE. calling sched() ncli: %d\n",cpuid(),myproc(),mycpu()->ncli);
