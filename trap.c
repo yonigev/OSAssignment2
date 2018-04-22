@@ -52,7 +52,6 @@ trap(struct trapframe *tf) {
         case T_IRQ0 + IRQ_TIMER:
             if (cpuid() == 0) {
                 if(!tempflag){
-                    cprintf("\n\n\n\n\n\n\n\ntickslock is: %d\n\n\n\n\n\n\n\n",&tickslock);
                     tempflag=1;
                 }
                 acquire(&tickslock);
