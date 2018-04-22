@@ -169,6 +169,8 @@ main(void)
       runcmd(parsecmd(buf));
     wait();
   }
+    printf(1,"<<<<SH>>>>3 procnum: %d",getpid());
+
   exit();
 }
 
