@@ -306,7 +306,7 @@ wait(void) {
     // }
     //acquire(&ptable.lock);
     pushcli();
-    cprintf("cpu: %d entered wait, process:  %d\n",mycpu(),curproc);
+    //cprintf("cpu: %d entered wait, process:  %d\n",mycpu(),curproc);
     for (;;) {
         // Scan through table looking for exited children.
         havekids = 0;
@@ -357,7 +357,7 @@ scheduler(void) {
     struct proc *p;
     struct cpu *c = mycpu();
     struct proc *oldp=c->proc;
-    cprintf("cpu: %d entered scheduler, process:  %d\n",c,oldp);
+    //cprintf("cpu: %d entered scheduler, process:  %d\n",c,myproc());
     if(myproc())
         cas((&myproc()->state),-RUNNABLE,RUNNABLE);
 
@@ -485,7 +485,7 @@ sleep(void *chan, struct spinlock* lk) {
     // so it's okay to release lk.
     
     pushcli();
-    cprintf("cpu: %d gonna sleep, process:  %d\n",mycpu(),p);
+    //cprintf("cpu: %d gonna sleep, process:  %d\n",mycpu(),p);
     if(cas(&(p->state),RUNNING,-SLEEPING)){
         // Go to sleep.
         p->chan = chan;
