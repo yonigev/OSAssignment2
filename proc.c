@@ -348,7 +348,7 @@ wait(void) {
         }
         //TODO:use CAS and lose ptable.lock parameter VV
         // Wait for children to exit.  (See wakeup1 call in proc_exit.)
-        cprintf("CPU --- %d,    in wait(),     , proc : %d CALLING sleep(), depth is: %d\n",cpuid(),curproc,mycpu()->ncli);
+     //   cprintf("CPU --- %d,    in wait(),     , proc : %d CALLING sleep(), depth is: %d\n",cpuid(),curproc,mycpu()->ncli);
         sleep(curproc, (struct spinlock*)-1);  //DOC: wait-sleep
     }
 }
@@ -439,12 +439,12 @@ sched(void) {
     // if (!holding(&ptable.lock))
     //     panic("sched ptable.lock");
     if (mycpu()->ncli != 1){
-        cprintf("CPU --- %d,    panicking. mycpu()->ncli: %d\n",cpuid(),mycpu()->ncli);
+    //    cprintf("CPU --- %d,    panicking. mycpu()->ncli: %d\n",cpuid(),mycpu()->ncli);
         panic("sched locks");
 
     }
     if ((p->state == RUNNING) || p->state == -RUNNING){   //TODO:ADDED -RUNNING.CHECK.
-        cprintf("CPU --- %d,    p is :%d,%d \n",cpuid(),p->pid,p);
+  //      cprintf("CPU --- %d,    p is :%d,%d \n",cpuid(),p->pid,p);
         panic("sched running");
     }
     if (readeflags() & FL_IF)
@@ -481,7 +481,7 @@ yield(void) {
 // will swtch here.  "Return" to user space.
 void
 forkret(void) {
-    cprintf("CPU --- %d,    process: %d om forkret\n",cpuid(),myproc());
+ //   cprintf("CPU --- %d,    process: %d om forkret\n",cpuid(),myproc());
     static int first = 1;
     // Still holding ptable.lock from scheduler.
     //release(&ptable.lock);
@@ -518,21 +518,21 @@ sleep(void *chan, struct spinlock* lk) {
 
     //cprintf("cpu: %d gonna sleep, process:  %d\n",mycpu(),p);
     if(cas(&(p->state),RUNNING,-SLEEPING)){
-        cprintf("CPU --- %d,    gonna sleep, process:  %d, chan: %d, LOCK:  %d\n",cpuid(),p,chan,lk);
+    //    cprintf("CPU --- %d,    gonna sleep, process:  %d, chan: %d, LOCK:  %d\n",cpuid(),p,chan,lk);
 
         // Go to sleep.
         p->chan = chan;
         //cas(&(p->state),-SLEEPING,SLEEPING);
     }
     if(lk != (struct spinlock*)-1){
-        cprintf("CPU --- %d,    in sleep, releasing: %d\n",cpuid(),lk);
+    //    cprintf("CPU --- %d,    in sleep, releasing: %d\n",cpuid(),lk);
         release(lk);
     }
     else
         popcli();
      
 
-    cprintf("CPU --- %d,    in sleep calling sched() ncli: %d\n",cpuid(),mycpu()->ncli);
+ //   cprintf("CPU --- %d,    in sleep calling sched() ncli: %d\n",cpuid(),mycpu()->ncli);
     
     sched();
     // Tidy up.
@@ -560,7 +560,7 @@ wakeup1(void *chan) {
         if(p->chan == chan){
              cprintf("CPU --- %d,   in wakeup1 looking at process : %d, chan: %d, state : %d \n",cpuid(),p,p->chan,p->state);
             if(!cas(&(p->state),SLEEPING,RUNNABLE)){    //if not sleeping TODO: maybe not necessary? 
-                while(!cas(&p->state,SLEEPING,RUNNABLE)){}               //busy wait while -sleeping
+                //while(!cas(&p->state,SLEEPING,RUNNABLE)){}               //busy wait while -sleeping
                 //cas(&(p->state),SLEEPING,-RUNNABLE);         //when finally sleeping-wake it up
             }
             else{
@@ -578,7 +578,7 @@ wakeup(void *chan) {
     pushcli();
 
     wakeup1(chan);
-    cprintf("CPU --- %d,    wakeup()-FINISHED waking up all processes who slept on chan:%d, processor: %d\n",cpuid(),chan,cpuid());
+    //cprintf("CPU --- %d,    wakeup()-FINISHED waking up all processes who slept on chan:%d, processor: %d\n",cpuid(),chan,cpuid());
     //release(&ptable.lock);
     popcli();
     }
