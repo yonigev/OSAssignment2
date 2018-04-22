@@ -443,7 +443,7 @@ sched(void) {
         panic("sched locks");
 
     }
-    if (p->state == RUNNING){// || p->state == -RUNNING)    //TODO:ADDED -RUNNING.CHECK.
+    if ((p->state == RUNNING) || p->state == -RUNNING){   //TODO:ADDED -RUNNING.CHECK.
         cprintf("CPU --- %d,    p is :%d,%d \n",cpuid(),p->pid,p);
         panic("sched running");
     }
@@ -558,8 +558,8 @@ wakeup1(void *chan) {
         if(p->chan == chan){
              cprintf("CPU --- %d,   in wakeup1 looking at process : %d, chan: %d, state : %d \n",cpuid(),p,p->chan,p->state);
             if(!cas(&(p->state),SLEEPING,RUNNABLE)){    //if not sleeping TODO: maybe not necessary? 
-               /// while(p->state == -SLEEPING){}               //busy wait while -sleeping
-               // cas(&(p->state),-SLEEPING,-RUNNABLE);         //when finally sleeping-wake it up
+                while(!cas(&p->state,SLEEPING,RUNNABLE)){}               //busy wait while -sleeping
+                //cas(&(p->state),SLEEPING,-RUNNABLE);         //when finally sleeping-wake it up
             }
             else{
                 cprintf("CPU --- %d,    waking up process: %d, to RUNNABLE\n",cpuid(),p);
