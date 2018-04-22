@@ -161,7 +161,10 @@ userinit(void) {
     
     //p->state = RUNNABLE;
     
-    cas(&(p->state),EMBRYO,RUNNABLE);
+    if(!cas(&(p->state),EMBRYO,RUNNABLE)){
+        cprintf("USER INIT IMPOSSIBle BUG\n");
+
+    }
       
     //release(&ptable.lock);
     popcli();
@@ -424,7 +427,7 @@ sched(void) {
     // if (!holding(&ptable.lock))
     //     panic("sched ptable.lock");
     if (mycpu()->ncli != 1){
-        //cprintf("panicking. mycpu()->ncli: %d\n",mycpu()->ncli);
+        cprintf("panicking. mycpu()->ncli: %d\n",mycpu()->ncli);
         panic("sched locks");
 
     }
