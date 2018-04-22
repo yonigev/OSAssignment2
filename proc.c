@@ -345,6 +345,7 @@ wait(void) {
         }
         //TODO:use CAS and lose ptable.lock parameter VV
         // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+        cprintf("in wait(), proc : %d CALLING sleep()\n",curproc);
         sleep(curproc, (struct spinlock*)0);  //DOC: wait-sleep
     }
 }
