@@ -561,6 +561,7 @@ wakeup(void *chan) {
     //acquire(&ptable.lock);
     pushcli();
     wakeup1(chan);
+    cprintf("wakeup()-FINISHED waking up all processes who slept on chan:%d\n",chan);
     //release(&ptable.lock);
     popcli();
 }
