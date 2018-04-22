@@ -347,7 +347,7 @@ wait(void) {
         //TODO:use CAS and lose ptable.lock parameter VV
         // Wait for children to exit.  (See wakeup1 call in proc_exit.)
         cprintf("in wait(), proc : %d CALLING sleep()\n",curproc);
-        sys_sleep(curproc);//, (struct spinlock*)0);  //DOC: wait-sleep
+        sleep(curproc, (struct spinlock*)0);  //DOC: wait-sleep
     }
 }
 
@@ -526,7 +526,7 @@ sleep(void *chan, struct spinlock* lk) {
     cprintf("in sleep calling sched() ncli: %d\n",mycpu()->ncli);
     sched();
     // Tidy up.
-    cas(&p->chan,(int)p->chan,0);
+    cas(&(p->chan),(int)p->chan,0);
     //p->chan = 0;
     if(lk !=0){
         acquire(lk);
