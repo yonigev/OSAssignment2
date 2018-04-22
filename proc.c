@@ -356,7 +356,9 @@ scheduler(void) {
     struct proc *p;
     struct cpu *c = mycpu();
     c->proc = 0;
-
+    if(myproc()){
+        cas(&(myproc()->state),-RUNNABLE,RUNNABLE);
+    }
     for (;;) {
         // Enable interrupts on this processor.
         sti();
@@ -366,7 +368,7 @@ scheduler(void) {
         pushcli();
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             //if (p->state != RUNNABLE)
-            if(!cas(&(p->state),RUNNABLE,-RUNNING) || !cas(&(p->state),-RUNNABLE,-RUNNING))
+            if(!cas(&(p->state),RUNNABLE,-RUNNING))// || !cas(&(p->state),-RUNNABLE,-RUNNING))
                 continue;
 
             // Switch to chosen process.  It is the process's job
