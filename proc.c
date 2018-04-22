@@ -471,7 +471,7 @@ yield(void) {
     
     // }
     //release(&ptable.lock);
-    cprintf("in yield,   CPU: %d   doing popcli()\n",cpuid());
+    cprintf("in yield,   CPU: %d   doing popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
 }
 
