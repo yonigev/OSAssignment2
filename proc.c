@@ -534,7 +534,7 @@ wakeup1(void *chan) {
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->chan == chan){
-            if(!cas(&(p->state),SLEEPING,-RUNNABLE)){    //if not sleeping TODO: maybe not necessary?
+            if(!cas(&(p->state),SLEEPING,RUNNABLE)){    //if not sleeping TODO: maybe not necessary?
                 //while(p->state == -SLEEPING){}               //busy wait while -sleeping
                 //cas(&(p->state),-SLEEPING,RUNNABLE);         //when finally sleeping-wake it up
             }
