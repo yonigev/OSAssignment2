@@ -154,6 +154,7 @@ main(void)
       break;
     }
   }
+  printf(1,"<<<<SH>>>>2 procnum: %d",getpid());
 
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
