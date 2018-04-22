@@ -64,6 +64,7 @@ sys_sleep(void) {
             release(&tickslock);
             return -1;
         }
+        cprintf("in sysproc!  calling sleep with proc: %d\n",myproc());
         sleep(&ticks, &tickslock);
     }
     release(&tickslock);
