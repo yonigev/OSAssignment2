@@ -366,7 +366,7 @@ scheduler(void) {
         pushcli();
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             //if (p->state != RUNNABLE)
-            if(!cas(&(p->state),RUNNABLE,-RUNNING))
+            if(!cas(&(p->state),RUNNABLE,-RUNNING) || !cas(&(p->state),-RUNNABLE,-RUNNING))
                 continue;
 
             // Switch to chosen process.  It is the process's job
@@ -424,12 +424,13 @@ void
 yield(void) {
    // acquire(&ptable.lock);  //DOC: yieldlock
     pushcli();
-    cas(&myproc()->state,RUNNING,RUNNABLE);
+    if(cas(&(myproc()->state),RUNNING,-RUNNABLE))
+        sched();
     // if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
     //     if(myproc() == initproc)
     //         cprintf("cpu: %d is making initproc yield()\n",mycpu());
     //     if(cas(&(myproc()->state),-RUNNABLE,RUNNABLE))
-    sched();
+    
     // }
     //release(&ptable.lock);
     popcli();
