@@ -392,7 +392,9 @@ scheduler(void) {
                 cprintf("what the fuck\n");
                 cas((&myproc()->state),-RUNNABLE,RUNNABLE);
                 cas((&myproc()->state),-SLEEPING,SLEEPING);
-                cas((&myproc()->state),-ZOMBIE,ZOMBIE);
+                if(cas((&myproc()->state),-ZOMBIE,ZOMBIE)){
+                    wakeup1(myproc()->parent);
+                }
                     //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
             }
             // Process is done running for now.
