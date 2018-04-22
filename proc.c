@@ -531,7 +531,7 @@ sleep(void *chan, struct spinlock* lk) {
     cas(&(p->chan),(int)p->chan,0);
     //p->chan = 0;
     if(lk !=0){
-        cprintf("\n\nACQUIRING LOCK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! %d\n\n",lk);
+        //cprintf("\n\nACQUIRING LOCK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! %d\n\n",lk);
         acquire(lk);
     }
     else
