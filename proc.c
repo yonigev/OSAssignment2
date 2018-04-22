@@ -474,6 +474,7 @@ yield(void) {
     //release(&ptable.lock);
     cprintf("in yield,   CPU: %d   doing popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
+    cprintf("in yield,   CPU: %d   FINISHED popcli(), now depth: %d\n",cpuid(),mycpu()->ncli);
 }
 
 // A fork child's very first scheduling by scheduler()
