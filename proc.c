@@ -416,6 +416,7 @@ sched(void) {
         panic("sched interruptible");
     intena = mycpu()->intena;
     swtch(&p->context, mycpu()->scheduler);
+    cas((&p->state),-RUNNABLE,RUNNABLE);
     mycpu()->intena = intena;
 }
 
@@ -425,7 +426,8 @@ yield(void) {
    // acquire(&ptable.lock);  //DOC: yieldlock
     pushcli();
     if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
-        sched();
+        sched();       
+
 
     }
     // if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
@@ -435,7 +437,6 @@ yield(void) {
     
     // }
     //release(&ptable.lock);
-    cas(&(myproc()->state),-RUNNABLE,RUNNABLE);
     popcli();
 }
 
