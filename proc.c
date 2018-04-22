@@ -355,8 +355,10 @@ void
 scheduler(void) {
     struct proc *p;
     struct cpu *c = mycpu();
+    cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+
     c->proc = 0;
-    
+
     for (;;) {
         // Enable interrupts on this processor.
         sti();
@@ -415,8 +417,7 @@ sched(void) {
     if (readeflags() & FL_IF)
         panic("sched interruptible");
     intena = mycpu()->intena;
-        cas((&p->state),-RUNNABLE,RUNNABLE);
-
+    
     swtch(&p->context, mycpu()->scheduler);
     mycpu()->intena = intena;
 }
