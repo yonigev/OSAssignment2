@@ -57,6 +57,7 @@ sys_sleep(void) {
 
     if (argint(0, &n) < 0)
         return -1;
+    cprintf("in sysproc!  acquire ticklock with: %d\n",myproc());
     acquire(&tickslock);
     ticks0 = ticks;
     while (ticks - ticks0 < n) {
