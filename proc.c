@@ -306,7 +306,7 @@ wait(void) {
     // }
     //acquire(&ptable.lock);
     pushcli();
-    cprintf("cpu: %d entered scheduler, process:  %d\n",mycpu(),p);
+    cprintf("cpu: %d entered wait, process:  %d\n",mycpu(),curproc);
     for (;;) {
         // Scan through table looking for exited children.
         havekids = 0;
