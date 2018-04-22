@@ -358,8 +358,11 @@ scheduler(void) {
     struct cpu *c = mycpu();
     //struct proc *oldp=c->proc;
     //cprintf("cpu: %d entered scheduler, process:  %d\n",c,myproc());
-    if(myproc())
+    if(myproc()){
         cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+        cas((&myproc()->state),-SLEEPING,SLEEPING);
+        //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+    }
 
     c->proc = 0;
 
@@ -372,7 +375,7 @@ scheduler(void) {
         pushcli();
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             //if (p->state != RUNNABLE)
-            if(!cas(&(p->state),RUNNABLE,-RUNNING))// || !cas(&(p->state),-RUNNABLE,-RUNNING))
+            if(!cas(&(p->state),RUNNABLE,RUNNING))// || !cas(&(p->state),-RUNNABLE,-RUNNING))
                 continue;
 
             // Switch to chosen process.  It is the process's job
@@ -380,7 +383,7 @@ scheduler(void) {
             // before jumping back to us.
             c->proc = p;
             switchuvm(p);
-            cas(&(p->state),-RUNNING,RUNNING);
+            //cas(&(p->state),-RUNNING,RUNNING);
             swtch(&(c->scheduler), p->context); 
             switchkvm();
             // Process is done running for now.
@@ -489,7 +492,7 @@ sleep(void *chan, struct spinlock* lk) {
     if(cas(&(p->state),RUNNING,-SLEEPING)){
         // Go to sleep.
         p->chan = chan;
-        cas(&(p->state),-SLEEPING,SLEEPING);
+        //cas(&(p->state),-SLEEPING,SLEEPING);
     }
     if(lk != 0){
         release(lk);
