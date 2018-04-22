@@ -356,7 +356,7 @@ void
 scheduler(void) {
     struct proc *p;
     struct cpu *c = mycpu();
-    struct proc *oldp=c->proc;
+    //struct proc *oldp=c->proc;
     //cprintf("cpu: %d entered scheduler, process:  %d\n",c,myproc());
     if(myproc())
         cas((&myproc()->state),-RUNNABLE,RUNNABLE);
