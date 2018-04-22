@@ -419,7 +419,7 @@ scheduler(void) {
            
         }
         //release(&ptable.lock);
-        cprintf("CPU --- %d,    in SCHEDULER, calling popcli()\n",cpuid());
+        //cprintf("CPU --- %d,    in SCHEDULER, calling popcli()\n",cpuid());
         popcli();
     }
 }
