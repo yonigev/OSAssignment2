@@ -229,7 +229,7 @@ fork(void) {
     pushcli();
     //task 2.1.2.2 - inheriting parent's stuff
     
-    //if process is not 0, and an EMBRYO, change to "transitioning to RUNNABLE"
+    //if process is not 0, and an EMBRYO, change to "transitioning to RUNNABLE", inherit parent's stuff
     if (curproc && cas(&(np->state),EMBRYO,-RUNNABLE)) {
         for (i = 0; i < 32; i++) { np->handlers[i] = curproc->handlers[i]; }
         np->mask = curproc->mask;
@@ -247,16 +247,13 @@ fork(void) {
 // until its parent calls wait() to find out it exited.
 void
 exit(void) {
-
     struct proc *curproc = myproc();
     struct proc *p;
     int fd;
-    
     if (curproc == initproc){
         //cprintf("cpu: %d is making initproc exit\n",mycpu());
         panic("init exiting");
     }
-
     // Close all open files.
     for (fd = 0; fd < NOFILE; fd++) {
         if (curproc->ofile[fd]) {
@@ -264,7 +261,6 @@ exit(void) {
             curproc->ofile[fd] = 0;
         }
     }
-
     begin_op();
     iput(curproc->cwd);
     end_op();
@@ -278,9 +274,9 @@ exit(void) {
         //TODO:USE CAS HERE
         // Pass abandoned children to init.
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            //if (p->parent == curproc) {
-            if (cas(&(p->parent),(int)curproc,(int)initproc)){
-                //p->parent = initproc;
+            if (p->parent == curproc) {
+            //if (cas(&(p->parent),(int)curproc,(int)initproc)){
+                p->parent = initproc;
                 //TODO: check if also -ZOMBIE needed
                 if (p->state == ZOMBIE )//|| p->state == -ZOMBIE)
                     wakeup1(initproc);
@@ -376,21 +372,14 @@ scheduler(void) {
             // Switch to chosen process.  It is the process's job
             // to release ptable.lock and then reacquire it
             // before jumping back to us.
-
-            //if(cas(&(p->state),RUNNABLE,-RUNNING)){
-                // if(p == initproc)
-                //     cprintf("cpu: %d running initproc: \n",c, initproc);
-                c->proc = p;
-                switchuvm(p);
-                //cprintf("switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
-                cas(&(p->state),-RUNNING,RUNNING);
-               // cprintf("REALLY! switching to : %d, state: %d, cpu: %d\n",p->pid,p->state,c);
-                swtch(&(c->scheduler), p->context);
-                
-                switchkvm();
-                // Process is done running for now.
-                // It should have changed its p->state before coming back.
-                c->proc = 0;
+            c->proc = p;
+            switchuvm(p);
+            cas(&(p->state),-RUNNING,RUNNING);
+            swtch(&(c->scheduler), p->context); 
+            switchkvm();
+            // Process is done running for now.
+            // It should have changed its p->state before coming back.
+             c->proc = 0;
             
            
         }
@@ -440,7 +429,7 @@ yield(void) {
     //     if(myproc() == initproc)
     //         cprintf("cpu: %d is making initproc yield()\n",mycpu());
     //     if(cas(&(myproc()->state),-RUNNABLE,RUNNABLE))
-    //         sched();
+    sched();
     // }
     //release(&ptable.lock);
     popcli();
