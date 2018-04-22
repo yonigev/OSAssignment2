@@ -519,7 +519,7 @@ sleep(void *chan, struct spinlock* lk) {
         p->chan = chan;
         //cas(&(p->state),-SLEEPING,SLEEPING);
     }
-    if(lk != 0){;
+    if(lk != 0){
         cprintf("in sleep, releaseing: %d\n",lk);
         release(lk);
     }
