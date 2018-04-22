@@ -358,11 +358,12 @@ scheduler(void) {
     struct cpu *c = mycpu();
     //struct proc *oldp=c->proc;
     //cprintf("cpu: %d entered scheduler, process:  %d\n",c,myproc());
-    if(myproc()){
-        cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-        cas((&myproc()->state),-SLEEPING,SLEEPING);
-        //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-    }
+    
+    // if(myproc()){
+    //     cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+    //     cas((&myproc()->state),-SLEEPING,SLEEPING);
+    //     //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+    // }
 
     c->proc = 0;
 
@@ -386,6 +387,13 @@ scheduler(void) {
             //cas(&(p->state),-RUNNING,RUNNING);
             swtch(&(c->scheduler), p->context); 
             switchkvm();
+
+            if(myproc()){
+                cprintf("what the fuck\n");
+                cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+                cas((&myproc()->state),-SLEEPING,SLEEPING);
+                    //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+            }
             // Process is done running for now.
             // It should have changed its p->state before coming back.
              c->proc = 0;
