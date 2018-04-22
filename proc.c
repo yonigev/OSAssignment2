@@ -528,11 +528,12 @@ sleep(void *chan, struct spinlock* lk) {
         cprintf("CPU --- %d,    in sleep, releasing: %d\n",cpuid(),lk);
         release(lk);
     }
+    else
+        popcli();
      
 
     cprintf("CPU --- %d,    in sleep calling sched() ncli: %d\n",cpuid(),mycpu()->ncli);
-    if(lk == (struct spinlock*)-1 && mycpu()->ncli  >1)
-        popcli();
+    
     sched();
     // Tidy up.
     cas(&(p->chan),(int)p->chan,0);
@@ -541,8 +542,9 @@ sleep(void *chan, struct spinlock* lk) {
         //cprintf("in sleep, acquiring: %d\n",lk);
         acquire(lk);
     }
-    // else
-    //     pushcli();
+    else
+        pushcli();
+   
 
     popcli();
 }
