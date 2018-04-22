@@ -11,7 +11,7 @@
 // Interrupt descriptor table (shared by all CPUs).
 struct gatedesc idt[256];
 extern uint vectors[];  // in vectors.S: array of 256 entry pointers
-
+int tempflag=0;
 extern void call_sigret_syscall(void);
 extern void end_sigret_syscall(void);
 
@@ -51,7 +51,10 @@ trap(struct trapframe *tf) {
     switch (tf->trapno) {
         case T_IRQ0 + IRQ_TIMER:
             if (cpuid() == 0) {
-                cprintf("tickslock is: %d\n",&tickslock);
+                if(!tempflag){
+                    cprintf("tickslock is: %d\n",&tickslock);
+                    tempflag=1;
+                }
                 acquire(&tickslock);
                 ticks++;
                 wakeup(&ticks);
