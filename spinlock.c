@@ -28,7 +28,7 @@ acquire(struct spinlock *lk)
   if(holding(lk)){
     
     
-    cprintf("gonna panic on acquire: %d\n",lk);
+    //cprintf("gonna panic on acquire: %d\n",lk);
     panic("acquire");
 
   }
