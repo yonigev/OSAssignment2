@@ -357,7 +357,7 @@ scheduler(void) {
     struct cpu *c = mycpu();
     c->proc = 0;
     if(myproc()){
-        cas(&(myproc()->state),-RUNNABLE,RUNNABLE);
+        //cas(&(myproc()->state),-RUNNABLE,RUNNABLE);
     }
     for (;;) {
         // Enable interrupts on this processor.
