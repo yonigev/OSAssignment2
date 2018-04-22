@@ -208,7 +208,9 @@ fork(void) {
     if ((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0) {
         kfree(np->kstack);
         np->kstack = 0;
-        cas(&(np->state),EMBRYO,UNUSED);
+        if(!cas(&(np->state),EMBRYO,UNUSED)){
+            cprintf("IMPOSSIBLE CAS FAILURE FORK\n");
+        }
         //np->state = UNUSED;
         return -1;
     }
@@ -273,7 +275,7 @@ exit(void) {
     pushcli();
     if(cas(&(curproc->state),RUNNING,-ZOMBIE)){
         // Parent might be sleeping in wait().
-        wakeup1(curproc->parent);
+        //  wakeup1(curproc->parent);
         //TODO:USE CAS HERE
         // Pass abandoned children to init.
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
@@ -285,7 +287,7 @@ exit(void) {
                     wakeup1(initproc);
             }
         }
-        cas(&(curproc->state),-ZOMBIE,ZOMBIE);
+        //cas(&(curproc->state),-ZOMBIE,ZOMBIE);
     }
   
 
@@ -390,19 +392,19 @@ scheduler(void) {
             //cas(&(p->state),-RUNNING,RUNNING);
             swtch(&(c->scheduler), p->context); 
             switchkvm();
-
-            if(myproc()){
-                cprintf("what the fuck\n");
-                cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-                cas((&myproc()->state),-SLEEPING,SLEEPING);
-                if(cas((&myproc()->state),-ZOMBIE,ZOMBIE)){
-                    wakeup1(myproc()->parent);
-                }
-                    //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-            }
             // Process is done running for now.
             // It should have changed its p->state before coming back.
              c->proc = 0;
+            if(p){
+                cprintf("what the fuck\n");
+                cas((&p->state),-RUNNABLE,RUNNABLE);
+                cas((&p->state),-SLEEPING,SLEEPING);
+                if(cas((&p->state),-ZOMBIE,ZOMBIE)){
+                    wakeup1(p->parent);
+                }
+                    //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+            }
+           
             
            
         }
