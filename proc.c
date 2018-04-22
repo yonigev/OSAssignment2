@@ -289,7 +289,7 @@ exit(void) {
                     wakeup1(initproc);
             }
         }
-        //cas(&(curproc->state),-ZOMBIE,ZOMBIE);
+        cas(&(curproc->state),-ZOMBIE,ZOMBIE);
     }
   
 
