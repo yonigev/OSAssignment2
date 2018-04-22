@@ -400,8 +400,10 @@ scheduler(void) {
 
         // Loop over process table looking for process to run.
         //acquire(&ptable.lock);
-        pushcli();
-        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+        cprintf("in SCHEDULER,   CPU: %d   doing pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
+         pushcli();
+        cprintf("in SCHEDULER,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);       
+     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             //if (p->state != RUNNABLE)
             if(!cas(&(p->state),RUNNABLE,RUNNING))// || !cas(&(p->state),-RUNNABLE,-RUNNING))
                 continue;
@@ -436,8 +438,9 @@ scheduler(void) {
            
         }
         //release(&ptable.lock);
-        popcli();
-
+        cprintf("in SCHEDULER,   CPU: %d   doing popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
+         popcli();
+        cprintf("in SCHEDULER,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);  
     }
 }
 
