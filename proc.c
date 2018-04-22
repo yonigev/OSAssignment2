@@ -560,7 +560,7 @@ wakeup(void *chan) {
     //acquire(&ptable.lock);
     pushcli();
     wakeup1(chan);
-    cprintf("wakeup()-FINISHED waking up all processes who slept on chan:%d, processor: %d\n",chan,mycpu());
+    cprintf("wakeup()-FINISHED waking up all processes who slept on chan:%d, processor: %d\n",chan,cpuid());
     //release(&ptable.lock);
     popcli();
 }
