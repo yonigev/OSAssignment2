@@ -400,6 +400,7 @@ scheduler(void) {
                 cas((&p->state),-RUNNABLE,RUNNABLE);
                 cas((&p->state),-SLEEPING,SLEEPING);
                 if(cas((&p->state),-ZOMBIE,ZOMBIE)){
+                    cprintf("waking up all who are sleeping on : %d 's parent - %d\n",p,p->parent);
                     wakeup1(p->parent);
                 }
                     //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
