@@ -365,17 +365,17 @@ scheduler(void) {
     struct cpu *c = mycpu();
     //struct proc *oldp=c->proc;
     //cprintf("cpu: %d entered scheduler, process:  %d\n",c,myproc());
-
+//  if(myproc()){
+//             cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+//             cas((&myproc()->state),-SLEEPING,SLEEPING);
+//             //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+//         }
     
 
     c->proc = 0;
 
     for (;;) {
-        if(myproc()){
-            cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-            cas((&myproc()->state),-SLEEPING,SLEEPING);
-            //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-        }
+       
         // Enable interrupts on this processor.
         sti();
 
@@ -478,6 +478,7 @@ yield(void) {
 // will swtch here.  "Return" to user space.
 void
 forkret(void) {
+    cprintf("process: %d om forkret\n",myproc());
     static int first = 1;
     // Still holding ptable.lock from scheduler.
     //release(&ptable.lock);
