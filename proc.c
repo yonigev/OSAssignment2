@@ -403,13 +403,13 @@ scheduler(void) {
             if(p){
                 
                 if(cas((&p->state),-RUNNABLE,RUNNABLE)){
-                    cprintf("\n\nCPU --- %d, SCHEDULER   <-RUNNABLE,RUNNABLE>    Changed p: %d from -RUNNABLE to RUNNABLE, depth:%d \n",cpuid(),p,mycpu()->ncli);
+                //    cprintf("\n\nCPU --- %d, SCHEDULER   <-RUNNABLE,RUNNABLE>    Changed p: %d from -RUNNABLE to RUNNABLE, depth:%d \n",cpuid(),p,mycpu()->ncli);
                 }
                 if(cas((&p->state),-SLEEPING,SLEEPING)){
-                    cprintf("\n\nCPU ---%d,  SCHEDULER   <-SLEEPING,SLEEPING>   p: %d from -SLEEPING to SLEEPING \n",cpuid(),p);
+                 //   cprintf("\n\nCPU ---%d,  SCHEDULER   <-SLEEPING,SLEEPING>   p: %d from -SLEEPING to SLEEPING \n",cpuid(),p);
                 }
                 if(cas((&p->state),-ZOMBIE,ZOMBIE)){
-                    cprintf("\n\nCPU --- %d,  SCHEDULER <-ZOMBIE,ZOMBIE> waking up all who are sleeping on : %d 's parent - %d\n",cpuid(),p,p->parent);
+                  //  cprintf("\n\nCPU --- %d,  SCHEDULER <-ZOMBIE,ZOMBIE> waking up all who are sleeping on : %d 's parent - %d\n",cpuid(),p,p->parent);
                     wakeup1(p->parent);
                 }
                     //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
@@ -558,13 +558,13 @@ wakeup1(void *chan) {
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->chan == chan){
-             cprintf("CPU --- %d,   in wakeup1 looking at process : %d, chan: %d, state : %d \n",cpuid(),p,p->chan,p->state);
+           //  cprintf("CPU --- %d,   in wakeup1 looking at process : %d, chan: %d, state : %d \n",cpuid(),p,p->chan,p->state);
             if(!cas(&(p->state),SLEEPING,RUNNABLE)){    //if not sleeping TODO: maybe not necessary? 
                 //while(!cas(&p->state,SLEEPING,RUNNABLE)){}               //busy wait while -sleeping
                 //cas(&(p->state),SLEEPING,-RUNNABLE);         //when finally sleeping-wake it up
             }
             else{
-                cprintf("CPU --- %d,    waking up process: %d, to RUNNABLE\n",cpuid(),p);
+             //   cprintf("CPU --- %d,    waking up process: %d, to RUNNABLE\n",cpuid(),p);
             }
         }
     }
