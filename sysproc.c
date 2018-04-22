@@ -20,7 +20,6 @@ sys_exit(void) {
 
 int
 sys_wait(void) {
-    cprintf("CPU    --- %d, in sys_wait, calling wait()\n",cpuid);
     return wait();
 }
 

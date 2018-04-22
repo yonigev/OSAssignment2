@@ -93,6 +93,7 @@ runcmd(struct cmd *cmd)
     lcmd = (struct listcmd*)cmd;
     if(fork1() == 0)
       runcmd(lcmd->left);
+    printf(1,"sh calling wait 1\n");
     wait();
     runcmd(lcmd->right);
     break;
@@ -117,7 +118,9 @@ runcmd(struct cmd *cmd)
     }
     close(p[0]);
     close(p[1]);
+    printf(1,"sh calling wait 2\n");
     wait();
+    printf(1,"sh calling wait 3\n");
     wait();
     break;
 
@@ -166,6 +169,7 @@ main(void)
     }
     if(fork1() == 0)
       runcmd(parsecmd(buf));
+    printf(1,"sh calling wait 4\n");
     wait();
   }
 
