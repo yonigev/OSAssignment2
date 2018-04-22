@@ -366,11 +366,11 @@ scheduler(void) {
     //struct proc *oldp=c->proc;
     //cprintf("cpu: %d entered scheduler, process:  %d\n",c,myproc());
 
-    // if(myproc()){
-    //     cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-    //     cas((&myproc()->state),-SLEEPING,SLEEPING);
-    //     //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-    // }
+    if(myproc()){
+        cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+        cas((&myproc()->state),-SLEEPING,SLEEPING);
+        //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+    }
 
     c->proc = 0;
 
@@ -397,20 +397,20 @@ scheduler(void) {
             // Process is done running for now.
             // It should have changed its p->state before coming back.
              c->proc = 0;
-            if(p){
-                cprintf("what the fuck\n");
-                if(cas((&p->state),-RUNNABLE,RUNNABLE)){
-                    cprintf("Changed p: %d from -RUNNABLE to RUNNABLE \n",p);
-                }
-                if(cas((&p->state),-SLEEPING,SLEEPING)){
-                    cprintf("Changed p: %d from -SLEEPING to SLEEPING \n",p);
-                }
-                if(cas((&p->state),-ZOMBIE,ZOMBIE)){
-                    cprintf("waking up all who are sleeping on : %d 's parent - %d\n",p,p->parent);
-                    wakeup1(p->parent);
-                }
-                    //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
-            }
+            // if(p){
+                
+            //     if(cas((&p->state),-RUNNABLE,RUNNABLE)){
+            //         cprintf("Changed p: %d from -RUNNABLE to RUNNABLE \n",p);
+            //     }
+            //     if(cas((&p->state),-SLEEPING,SLEEPING)){
+            //         cprintf("Changed p: %d from -SLEEPING to SLEEPING \n",p);
+            //     }
+            //     if(cas((&p->state),-ZOMBIE,ZOMBIE)){
+            //         cprintf("waking up all who are sleeping on : %d 's parent - %d\n",p,p->parent);
+            //         wakeup1(p->parent);
+            //     }
+            //         //cas((&myproc()->state),-RUNNABLE,RUNNABLE);
+            // }
            
             
            
