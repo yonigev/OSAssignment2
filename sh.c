@@ -93,7 +93,6 @@ runcmd(struct cmd *cmd)
     lcmd = (struct listcmd*)cmd;
     if(fork1() == 0)
       runcmd(lcmd->left);
-    printf(1,"in sh gonna sleep\n\n");
     wait();
     runcmd(lcmd->right);
     break;
@@ -118,9 +117,7 @@ runcmd(struct cmd *cmd)
     }
     close(p[0]);
     close(p[1]);
-    printf(1,"in sh gonna sleep2\n\n");
     wait();
-    printf(1,"in sh gonna sleep3\n\n");
     wait();
     break;
 
@@ -169,7 +166,6 @@ main(void)
     }
     if(fork1() == 0)
       runcmd(parsecmd(buf));
-    printf(1,"in sh gonna sleep4\n\n");
     wait();
   }
   exit();
