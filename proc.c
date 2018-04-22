@@ -356,6 +356,7 @@ scheduler(void) {
     struct proc *p;
     struct cpu *c = mycpu();
     if(myproc()){
+        cprintf("DAMN\n\n");
         cas(&(myproc()->state),-RUNNABLE,RUNNABLE);
     }
     c->proc = 0;
