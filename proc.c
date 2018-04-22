@@ -426,7 +426,6 @@ yield(void) {
     pushcli();
     if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
         sched();
-        cas(&(myproc()->state),-RUNNABLE,RUNNABLE);
 
     }
     // if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
@@ -436,6 +435,7 @@ yield(void) {
     
     // }
     //release(&ptable.lock);
+    cas(&(myproc()->state),-RUNNABLE,RUNNABLE);
     popcli();
 }
 
