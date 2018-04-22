@@ -541,7 +541,7 @@ wakeup1(void *chan) {
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->chan == chan){
-             cprintf("in wakeup1 looking at process : %d, chan: %d, state : %d \n",p->pid,((struct proc*)p->chan)->pid,p->state);
+             cprintf("in wakeup1 looking at process : %d, chan: %d, state : %d \n",p,p->chan,p->state);
             if(!cas(&(p->state),SLEEPING,-RUNNABLE)){    //if not sleeping TODO: maybe not necessary?
                 
             //    while(p->state == -SLEEPING){}               //busy wait while -sleeping
@@ -561,7 +561,7 @@ wakeup(void *chan) {
     //acquire(&ptable.lock);
     pushcli();
     wakeup1(chan);
-    cprintf("wakeup()-FINISHED waking up all processes who slept on chan:%d\n",((struct proc*)chan)->pid);
+    cprintf("wakeup()-FINISHED waking up all processes who slept on chan:%d\n",chan);
     //release(&ptable.lock);
     popcli();
 }
