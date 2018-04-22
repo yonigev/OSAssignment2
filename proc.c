@@ -355,10 +355,6 @@ void
 scheduler(void) {
     struct proc *p;
     struct cpu *c = mycpu();
-    if(myproc()){
-        cprintf("DAMN\n\n");
-        cas(&(myproc()->state),-RUNNABLE,RUNNABLE);
-    }
     c->proc = 0;
     
     for (;;) {
@@ -428,8 +424,11 @@ void
 yield(void) {
    // acquire(&ptable.lock);  //DOC: yieldlock
     pushcli();
-    if(cas(&(myproc()->state),RUNNING,-RUNNABLE))
+    if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
         sched();
+        cas(&(myproc()->state),-RUNNABLE,RUNNABLE);
+
+    }
     // if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
     //     if(myproc() == initproc)
     //         cprintf("cpu: %d is making initproc yield()\n",mycpu());
