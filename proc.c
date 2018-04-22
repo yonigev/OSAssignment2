@@ -541,7 +541,7 @@ wakeup1(void *chan) {
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->chan == chan){
-             cprintf("in wakeup1 looking at process : %d, chan: %d \n",p,p->chan);
+             cprintf("in wakeup1 looking at process : %d, chan: %d, state : %d \n",p,p->chan,p->state);
             if(!cas(&(p->state),SLEEPING,-RUNNABLE)){    //if not sleeping TODO: maybe not necessary?
                 cprintf("waking up process: %d, to -RUNNABLE\n",p);
             //    while(p->state == -SLEEPING){}               //busy wait while -sleeping
