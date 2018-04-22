@@ -275,7 +275,7 @@ exit(void) {
     pushcli();
     if(cas(&(curproc->state),RUNNING,-ZOMBIE)){
         // Parent might be sleeping in wait().
-        //  wakeup1(curproc->parent);
+          wakeup1(curproc->parent);
         //TODO:USE CAS HERE
         // Pass abandoned children to init.
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
