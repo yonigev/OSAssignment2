@@ -249,6 +249,7 @@ consoleread(struct inode *ip, char *dst, int n)
         ilock(ip);
         return -1;
       }
+      cprintf("in consoleread gonna sleep\n");
       sleep(&input.r, &cons.lock);
     }
     c = input.buf[input.r++ % INPUT_BUF];
