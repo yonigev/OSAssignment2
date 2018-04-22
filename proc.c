@@ -294,6 +294,7 @@ exit(void) {
     // Jump into the scheduler, never to return.
     //curproc->state = ZOMBIE;
     //TODO: sched!!!
+    cprintf("in exit calling sched() ncli: %d\n",mycpu()->ncli);
     sched();
     panic("zombie exit");
 }
@@ -457,6 +458,7 @@ yield(void) {
    // acquire(&ptable.lock);  //DOC: yieldlock
     pushcli();
     if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
+        cprintf("in yield,changed state of : %d to -RUNNABLE. calling sched() ncli: %d\n",myproc(),mycpu()->ncli);
         sched();       
 
 
@@ -520,7 +522,7 @@ sleep(void *chan, struct spinlock* lk) {
     if(lk != 0){
         release(lk);
     }
-  
+    cprintf("in sleep calling sched() ncli: %d\n",mycpu()->ncli);
     sched();
     // Tidy up.
     cas(&p->chan,(int)p->chan,0);
@@ -547,7 +549,7 @@ wakeup1(void *chan) {
               //  cas(&(p->state),SLEEPING,-RUNNABLE);         //when finally sleeping-wake it up
             }
             else{
-                cprintf("waking up process: %d, to -RUNNABLE\n",p);
+                cprintf("waking up process: %d, to RUNNABLE\n",p);
             }
         }
     }
