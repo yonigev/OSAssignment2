@@ -58,10 +58,14 @@ struct proc *
 myproc(void) {
     struct cpu *c;
     struct proc *p;
+    cprintf("in MYPROC,   CPU: %d   DOING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     pushcli();
+    cprintf("in MYPROC,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     c = mycpu();
     p = c->proc;
+    cprintf("in MYPROC,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
+    cprintf("in MYPROC,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     return p;
 }
 
@@ -156,7 +160,9 @@ userinit(void) {
     // because the assignment might not be atomic.
 
     //acquire(&ptable.lock);
+    cprintf("in userinit,   CPU: %d   doing pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     pushcli();
+    cprintf("in userinit,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
 
     
     
@@ -168,7 +174,9 @@ userinit(void) {
     }
       
     //release(&ptable.lock);
+    cprintf("in USERINIT,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
+    cprintf("in USERINIT,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);}
 
 // Grow current process's memory by n bytes.
 // Return 0 on success, -1 on failure.
@@ -231,7 +239,9 @@ fork(void) {
     pid = np->pid;
 
     //acquire(&ptable.lock);
+    cprintf("in fork,   CPU: %d   doing pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     pushcli();
+    cprintf("in fork,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     
     //task 2.1.2.2 - inheriting parent's stuff
     
@@ -244,7 +254,9 @@ fork(void) {
     }
 
     //release(&ptable.lock);
+    cprintf("in FORK,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
+    cprintf("in FORK,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);    return pid;
 }
 
 // Exit the current process.  Does not return.
@@ -272,7 +284,9 @@ exit(void) {
     curproc->cwd = 0;
 
     //acquire(&ptable.lock);D
+    cprintf("in exit,   CPU: %d   DOING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     pushcli();
+    cprintf("in exit,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
 
     if(cas(&(curproc->state),RUNNING,-ZOMBIE)){
         // Parent might be sleeping in wait().
@@ -312,7 +326,9 @@ wait(void) {
     //     cprintf("initproc entered wait with cpu: %d\n",mycpu());
     // }
     //acquire(&ptable.lock);
+    cprintf("in wait,   CPU: %d   DOING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     pushcli();
+    cprintf("in wait,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     //cprintf("cpu: %d entered wait, process:  %d\n",mycpu(),curproc);
     for (;;) {
         // Scan through table looking for exited children.
@@ -334,14 +350,18 @@ wait(void) {
                 p->killed = 0;
                 cas(&(p->state),-UNUSED,UNUSED);
                 //release(&ptable.lock);
+                cprintf("in WAIT,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
                 popcli();
+                cprintf("in WAIT,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);                return pid;
             }
         }
 
         // No point waiting if we don't have any children.
         if (!havekids || curproc->killed) {
             //release(&ptable.lock);
+            cprintf("in MYPROC,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
             popcli();
+            cprintf("in MYPROC,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);            return -1;
         }
         //TODO:use CAS and lose ptable.lock parameter VV
         // Wait for children to exit.  (See wakeup1 call in proc_exit.)
@@ -380,7 +400,9 @@ scheduler(void) {
 
         // Loop over process table looking for process to run.
         //acquire(&ptable.lock);
+        cprintf("in SCHEDULER,   CPU: %d   doing pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
          pushcli();
+        cprintf("in SCHEDULER,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);       
      for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             //if (p->state != RUNNABLE)
             if(!cas(&(p->state),RUNNABLE,RUNNING))// || !cas(&(p->state),-RUNNABLE,-RUNNING))
@@ -416,7 +438,9 @@ scheduler(void) {
            
         }
         //release(&ptable.lock);
+        cprintf("in SCHEDULER,   CPU: %d   doing popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
          popcli();
+        cprintf("in SCHEDULER,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);  
     }
 }
 
@@ -455,7 +479,9 @@ sched(void) {
 void
 yield(void) {
    // acquire(&ptable.lock);  //DOC: yieldlock
+    cprintf("in yield,   CPU: %d   DOING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     pushcli();
+    cprintf("in yield,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
 
     if(cas(&(myproc()->state),RUNNING,-RUNNABLE)){
         cprintf("in yield,   CPU: %d     ,changed state of : %d to -RUNNABLE. calling sched() ncli: %d\n",cpuid(),myproc(),mycpu()->ncli);
@@ -470,7 +496,9 @@ yield(void) {
     
     // }
     //release(&ptable.lock);
+    cprintf("in yield,   CPU: %d   doing popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
+    cprintf("in yield,   CPU: %d   FINISHED popcli(), now depth: %d\n",cpuid(),mycpu()->ncli);
 }
 
 // A fork child's very first scheduling by scheduler()
@@ -481,7 +509,9 @@ forkret(void) {
     static int first = 1;
     // Still holding ptable.lock from scheduler.
     //release(&ptable.lock);
+    cprintf("in FORKRET,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
+    cprintf("in FORKRET,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     if (first) {
         // Some initialization functions must be run in the context
         // of a regular process (e.g., they call sleep), and thus cannot
@@ -510,8 +540,10 @@ sleep(void *chan, struct spinlock* lk) {
     // guaranteed that we won't miss any wakeup
     // (wakeup runs with ptable.lock locked),
     // so it's okay to release lk.
+    cprintf("in sleep,   CPU: %d   DOING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
 
     pushcli();
+    cprintf("in sleep,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
 
     //cprintf("cpu: %d gonna sleep, process:  %d\n",mycpu(),p);
     if(cas(&(p->state),RUNNING,-SLEEPING)){
@@ -539,7 +571,9 @@ sleep(void *chan, struct spinlock* lk) {
     // else
     //     pushcli();
 
+    cprintf("in SLEEP,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
+    cprintf("in SLEEP,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
 }
 
 //PAGEBREAK!
@@ -568,12 +602,16 @@ wakeup1(void *chan) {
 void
 wakeup(void *chan) {
     //acquire(&ptable.lock);
+    cprintf("in wakeup,   CPU: %d   DOING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     pushcli();
+    cprintf("in wakeup,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
 
     wakeup1(chan);
     cprintf("wakeup()-FINISHED waking up all processes who slept on chan:%d, processor: %d\n",chan,cpuid());
     //release(&ptable.lock);
+    cprintf("in WAKEUP,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
+    cprintf("in WAKEUP,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);}
 
 
 //sets a signal 'signum' to process p, Atomically
@@ -593,17 +631,23 @@ kill(int pid, int signum) {
     //Legal signal number
     if (signum >= 0 && signum <= 31) {
         //acquire(&ptable.lock);
+        cprintf("in KILL,   CPU: %d   DOING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
         pushcli();
+        cprintf("in KILL,   CPU: %d   FINISHING pushcli() with depth: %d\n",cpuid(),mycpu()->ncli);
         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
             if (p->pid == pid) {
                atomic_set_signal(p,signum);               
                 //release(&ptable.lock);
+                cprintf("in KILL INNER IF,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
                 popcli();
+                cprintf("in KILL INNER IF,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);                
                 return 0;
             }
         }
         //release(&ptable.lock);
+    cprintf("in KILL,   CPU: %d   DOING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);
     popcli();
+    cprintf("in KILL,   CPU: %d   FINISHING popcli() with depth: %d\n",cpuid(),mycpu()->ncli);    }
     return -1;
 }
 
