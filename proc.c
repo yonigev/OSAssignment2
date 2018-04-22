@@ -482,6 +482,7 @@ sleep(void *chan, struct spinlock* lk) {
     // so it's okay to release lk.
     
     pushcli();
+    cprintf("cpu: %d gonna sleep, process:  %d\n",mycpu(),p);
     if(cas(&(p->state),RUNNING,-SLEEPING)){
         // Go to sleep.
         p->chan = chan;
