@@ -2,10 +2,10 @@
 static inline int
 cas(volatile void *addr, int expected, int newval){
   int result = 0;
-  asm volatile("lock; cmpxchgl %3, (%2)\n\t"  //compare eax to (addr), if equal, put newval in (addr), and set ZF. else, clear ZF and load (addr) into eax 
+  asm volatile("lock; cmpxchgl %3, (%2)\n\t"  //compare eax to (addr), if equal, put newval in (addr), and set ZF. else, clear ZF and load (addr) into eax
                 "setz %0\n\t"
                 : "=m"(result)
-                : "a"(expected), "b"(addr), "r"(newval) //expected -> eax. 
+                : "a"(expected), "b"(addr), "r"(newval) //expected -> eax.
                 : "memory");
   return result;
 }

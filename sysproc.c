@@ -57,7 +57,7 @@ sys_sleep(void) {
 
     if (argint(0, &n) < 0)
         return -1;
-    cprintf("in sysproc!  acquire ticklock with: %d\n",myproc());
+    //cprintf("in sysproc!  acquire ticklock with: %d\n",myproc());
     acquire(&tickslock);
     ticks0 = ticks;
     while (ticks - ticks0 < n) {
@@ -65,7 +65,7 @@ sys_sleep(void) {
             release(&tickslock);
             return -1;
         }
-        cprintf("in sysproc!  calling sleep with proc: %d\n",myproc());
+      //  cprintf("in sysproc!  calling sleep with proc: %d\n",myproc());
         sleep(&ticks, &tickslock);
     }
     release(&tickslock);
@@ -95,7 +95,7 @@ int sys_sigprocmask(void) {
 //Task 2.1.4
 int sys_signal(void) {
     int signum;
-    int handler=7;
+    int handler;
     //TODO:make sure 'argint' is ok
 
     if (argint(0, &signum) < 0 || argint(1,  &handler) < 0)

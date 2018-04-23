@@ -1755,49 +1755,56 @@ main(int argc, char *argv[])
     exit();
   }
   close(open("usertests.ran", O_CREATE));
+    int i=0;
+for(i=0;i<6;++i) {
+    printf(1,"start iter : %d", i);
+    argptest();
+    createdelete();
+    linkunlink();
+    concreate();
+    fourfiles();
+    sharedfd();
 
-  argptest();
-  createdelete();
-  linkunlink();
-  concreate();
-  fourfiles();
-  sharedfd();
+    bigargtest();
+    // bigwrite();
+    bigargtest();
+    bsstest();
 
-  bigargtest();
-  bigwrite();
-  bigargtest();
-  bsstest();
-  sbrktest();
-  validatetest();
+    sbrktest();
 
-  opentest();
-  writetest();
-  writetest1();
-  createtest();
+    validatetest();
 
-  openiputtest();
-  exitiputtest();
-  iputtest();
+    opentest();
+    writetest();
+    writetest1();
+    createtest();
 
-  mem();
-  pipe1();
-  preempt();
-  exitwait();
+    openiputtest();
+    exitiputtest();
+    iputtest();
 
-  rmdot();
-  fourteen();
-  bigfile();
-  subdir();
-  linktest();
-  unlinkread();
-  dirfile();
-  iref();
-  forktest();
-  bigdir(); // slow
+    mem();
+    pipe1();
+    printf(1,"iter : %d", i);
+    preempt();
+    exitwait();
 
-  uio();
+    rmdot();
+    fourteen();
+    bigfile();
+    subdir();
+    printf(1,"iter : %d", i);
+    linktest();
+    unlinkread();
+    dirfile();
+    iref();
+    forktest();
 
-  exectest();
+    //bigdir(); // slow
+
+    uio();
+}
+    exectest();
 
   exit();
 }

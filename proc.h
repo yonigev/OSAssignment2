@@ -41,9 +41,8 @@ struct context {
 int hasSignal(struct proc *p, int signum);
 int isBlocked(int signum);
 
-enum procstate {
-    UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE
-};
+enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
+
 
 // Per-process state
 struct proc {

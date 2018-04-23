@@ -91,9 +91,9 @@ trap(struct trapframe *tf) {
                         tf->trapno, cpuid(), tf->eip, rcr2());
                 panic("trap");
             }
-            if(myproc()){
-                cprintf("NOW EIP IS: %d\n",myproc()->tf->eip);
-            }
+//            if(myproc()){
+//                cprintf("NOW EIP IS: %d\n",myproc()->tf->eip);
+//            }
             // In user space, assume process misbehaved.
             cprintf("pid %d %s: trap %d err %d on cpu %d "
                             "eip 0x%x addr 0x%x--kill proc\n",
