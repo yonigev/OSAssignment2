@@ -156,9 +156,13 @@ void handle_SIGSTOP(struct proc* curproc){
     }
 }
 void handle_SIGKILL(struct proc* curproc){
-     curproc->killed = 1;
-    if (curproc->state == SLEEPING)
-        curproc->state = RUNNABLE;
+    if (cas(&curproc->killed, 0, 1)){} //TODO :: why comes killed = 1
+    while (curproc->state == -SLEEPING) {}
+    if (cas(&curproc->state, SLEEPING, -RUNNABLE)) {
+        curproc->chan = 0;
+        if (!cas(&curproc->state, -RUNNABLE, RUNNABLE))
+            panic("kill: cas #2 failed");
+    }
 }
 void handle_SIGCONT(struct proc* curproc){
   if (hasSignal(curproc, SIGSTOP)){
@@ -179,7 +183,7 @@ check_kernel_sigs() {
 
     int i;
     //check each possible signal
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < 32; cas(&i, i , i+1)) {
 
         if( !(hasSignal(curproc, i) && !isBlocked(i)) ){       //if signal i should NOT be handled right now, go to the next one
             continue;
@@ -191,17 +195,17 @@ check_kernel_sigs() {
 
         switch (i) {
             case SIGKILL:
-                if (curproc->handlers[i] == (void*)SIG_DFL ||  curproc->handlers[i] == (void*)SIGKILL ) {
+                if (curproc->handlers[i] == (void*)SIG_DFL ){//||  curproc->handlers[i] == (void*)SIGKILL ) {
                     handle_SIGKILL(curproc);
                 }
                 break;
             case SIGCONT:
-                if (curproc->handlers[i] == (void*)SIG_DFL || curproc->handlers[i] == (void*)SIGCONT) {
+                if (curproc->handlers[i] == (void*)SIG_DFL ){//|| curproc->handlers[i] == (void*)SIGCONT) {
                     handle_SIGCONT(curproc);
                 }
                 break;
             case SIGSTOP:
-                if (curproc->handlers[i] == (void*)SIG_DFL || curproc->handlers[i] == (void*)SIGSTOP)
+                if (curproc->handlers[i] == (void*)SIG_DFL) //|| curproc->handlers[i] == (void*)SIGSTOP)
                     handle_SIGSTOP(curproc);
                 break;
             default:
@@ -243,10 +247,7 @@ check_kernel_sigs() {
                     *((int *) curproc->tf->esp) = (int) injected_pointer;
                     cancelSignal(curproc,i);            //cancel the signal, it's handled right now.
                     return;
-                break;
             }
-
-            
         }
         curproc->mask = curproc->mask_backup;     //restore the mask
     }
