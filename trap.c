@@ -39,12 +39,14 @@ trap(struct trapframe *tf) {
 
     if (tf->trapno == T_SYSCALL) {
 
-        if (myproc()->killed)
+        if (myproc()->killed) {
             exit();
+        }
         myproc()->tf = tf;
         syscall();
-        if (myproc()->killed)
+        if (myproc()->killed) {
             exit();
+        }
         return;
     }
 
@@ -91,9 +93,6 @@ trap(struct trapframe *tf) {
                         tf->trapno, cpuid(), tf->eip, rcr2());
                 panic("trap");
             }
-//            if(myproc()){
-//                cprintf("NOW EIP IS: %d\n",myproc()->tf->eip);
-//            }
             // In user space, assume process misbehaved.
             cprintf("pid %d %s: trap %d err %d on cpu %d "
                             "eip 0x%x addr 0x%x--kill proc\n",
@@ -156,7 +155,8 @@ void handle_SIGSTOP(struct proc* curproc){
     }
 }
 void handle_SIGKILL(struct proc* curproc){
-    if (cas(&curproc->killed, 0, 1)){} //TODO :: why comes killed = 1
+    if (cas(&curproc->killed, 0, 1)){
+    } //TODO :: why comes killed = 1
     while (curproc->state == -SLEEPING) {}
     if (cas(&curproc->state, SLEEPING, -RUNNABLE)) {
         curproc->chan = 0;
@@ -183,7 +183,7 @@ check_kernel_sigs() {
 
     int i;
     //check each possible signal
-    for (i = 0; i < 32; cas(&i, i , i+1)) {
+    for (i = 0; i < 32; i++) {
 
         if( !(hasSignal(curproc, i) && !isBlocked(i)) ){       //if signal i should NOT be handled right now, go to the next one
             continue;
